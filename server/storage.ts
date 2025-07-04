@@ -140,15 +140,15 @@ export class DatabaseStorage implements IStorage {
       );
     }
 
-    if (filters?.location) {
+    if (filters?.location && filters.location !== "all") {
       conditions.push(eq(profiles.location, filters.location));
     }
 
-    if (filters?.role) {
+    if (filters?.role && filters.role !== "all") {
       conditions.push(eq(profiles.role, filters.role));
     }
 
-    if (filters?.skillLevel) {
+    if (filters?.skillLevel && filters.skillLevel !== "all") {
       conditions.push(eq(profiles.skillLevel, filters.skillLevel));
     }
 

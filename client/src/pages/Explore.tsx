@@ -12,7 +12,7 @@ import type { UserWithProfile } from "@shared/schema";
 export default function Explore() {
   const [filters, setFilters] = useState({
     search: "",
-    location: "",
+    location: "all",
     role: "all",
     skillLevel: "all",
   });

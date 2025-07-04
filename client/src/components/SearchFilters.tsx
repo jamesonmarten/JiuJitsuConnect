@@ -22,9 +22,9 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
   const clearFilters = () => {
     onFilterChange({
       search: "",
-      location: "",
-      role: "",
-      skillLevel: "",
+      location: "all",
+      role: "all",
+      skillLevel: "all",
     });
   };
 
@@ -51,7 +51,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
               <SelectValue placeholder="All Locations" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Locations</SelectItem>
+              <SelectItem value="all">All Locations</SelectItem>
               <SelectItem value="longwood">Longwood</SelectItem>
               <SelectItem value="orlando">Orlando</SelectItem>
               <SelectItem value="winter-park">Winter Park</SelectItem>
@@ -68,7 +68,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
               <SelectValue placeholder="All Roles" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Roles</SelectItem>
+              <SelectItem value="all">All Roles</SelectItem>
               <SelectItem value="member">Member</SelectItem>
               <SelectItem value="instructor">Instructor</SelectItem>
             </SelectContent>
@@ -82,7 +82,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
               <SelectValue placeholder="All Levels" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Levels</SelectItem>
+              <SelectItem value="all">All Levels</SelectItem>
               <SelectItem value="beginner">Beginner</SelectItem>
               <SelectItem value="intermediate">Intermediate</SelectItem>
               <SelectItem value="advanced">Advanced</SelectItem>
