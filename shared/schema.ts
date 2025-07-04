@@ -47,6 +47,9 @@ export const profiles = pgTable("profiles", {
   beltRank: varchar("belt_rank"),
   experience: varchar("experience"),
   about: text("about"),
+  bio: text("bio"), // Additional bio field for compatibility
+  trainingGoals: text("training_goals"), // Training objectives
+  availability: text("availability"), // Training availability
   phone: varchar("phone"),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
