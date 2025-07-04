@@ -15,12 +15,17 @@ import Ratings from "@/pages/Ratings";
 import Navbar from "@/components/Navbar";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
+
+  console.log("Router state:", { isAuthenticated, isLoading, user });
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
       </div>
     );
   }
@@ -33,12 +38,14 @@ function Router() {
         ) : (
           <>
             <Navbar />
-            <Route path="/" component={Home} />
-            <Route path="/explore" component={Explore} />
-            <Route path="/profile/:id" component={ProfileDetail} />
-            <Route path="/profile-edit" component={ProfileEdit} />
-            <Route path="/my-profile" component={MyProfile} />
-            <Route path="/ratings" component={Ratings} />
+            <main className="pt-4">
+              <Route path="/" component={Home} />
+              <Route path="/explore" component={Explore} />
+              <Route path="/profile/:id" component={ProfileDetail} />
+              <Route path="/profile-edit" component={ProfileEdit} />
+              <Route path="/my-profile" component={MyProfile} />
+              <Route path="/ratings" component={Ratings} />
+            </main>
           </>
         )}
         <Route component={NotFound} />
