@@ -19,29 +19,31 @@ function Router() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <Switch>
-      {!isAuthenticated ? (
-        <Route path="/" component={Landing} />
-      ) : (
-        <>
-          <Navbar />
-          <Route path="/" component={Home} />
-          <Route path="/explore" component={Explore} />
-          <Route path="/profile/:id" component={ProfileDetail} />
-          <Route path="/profile-edit" component={ProfileEdit} />
-          <Route path="/my-profile" component={MyProfile} />
-          <Route path="/ratings" component={Ratings} />
-        </>
-      )}
-      <Route component={NotFound} />
-    </Switch>
+    <div className="min-h-screen bg-background">
+      <Switch>
+        {!isAuthenticated ? (
+          <Route path="/" component={Landing} />
+        ) : (
+          <>
+            <Navbar />
+            <Route path="/" component={Home} />
+            <Route path="/explore" component={Explore} />
+            <Route path="/profile/:id" component={ProfileDetail} />
+            <Route path="/profile-edit" component={ProfileEdit} />
+            <Route path="/my-profile" component={MyProfile} />
+            <Route path="/ratings" component={Ratings} />
+          </>
+        )}
+        <Route component={NotFound} />
+      </Switch>
+    </div>
   );
 }
 
@@ -49,8 +51,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Router />
+        <div className="min-h-screen bg-background">
+          <Router />
+          <Toaster />
+        </div>
       </TooltipProvider>
     </QueryClientProvider>
   );

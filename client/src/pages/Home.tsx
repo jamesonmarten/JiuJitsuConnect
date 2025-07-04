@@ -9,16 +9,20 @@ import { Link } from "wouter";
 export default function Home() {
   const { user } = useAuth();
   
-  const { data: profile } = useQuery({
+  const { data: profile } = useQuery<any>({
     queryKey: ["/api/profiles/me"],
     enabled: !!user,
   });
 
-  const { data: stats } = useQuery({
+  const { data: stats } = useQuery<{
+    averageRating: number;
+    totalReviews: number;
+    activeMembers: number;
+  }>({
     queryKey: ["/api/ratings/stats"],
   });
 
-  const { data: recentUsers } = useQuery({
+  const { data: recentUsers } = useQuery<any[]>({
     queryKey: ["/api/users", { limit: 4 }],
   });
 
@@ -29,7 +33,7 @@ export default function Home() {
       {/* Welcome Section */}
       <div className="mb-8 text-center">
         <h1 className="welcome-title mb-4 floating">
-          Welcome back, {user?.firstName || 'Fighter'}! 🥋
+          Welcome back, Fighter! 🥋
         </h1>
         <p className="text-muted-foreground text-lg">
           Connect with the Jiu-Jitsu community in Longwood & Orlando
@@ -51,8 +55,8 @@ export default function Home() {
                 </p>
               </div>
               <Link href="/profile-edit">
-                <Button className="bg-accent hover:bg-accent/90">
-                  Create Profile
+                <Button className="bg-accent hover:bg-accent/90 text-white">
+                  Complete Profile
                 </Button>
               </Link>
             </div>
@@ -64,7 +68,7 @@ export default function Home() {
       <div className="grid md:grid-cols-3 gap-6 mb-8">
         <Card className="stats-card">
           <CardContent className="p-6">
-            <div className="stats-number">{stats?.averageRating.toFixed(1) || "0.0"}</div>
+            <div className="stats-number">{stats?.averageRating?.toFixed(1) || "0.0"}</div>
             <div className="text-muted-foreground">Average Rating</div>
           </CardContent>
         </Card>
@@ -92,12 +96,12 @@ export default function Home() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground mb-4">
-              Discover martial artists in your area and skill level
+            <p className="text-sm text-muted-foreground mb-4">
+              Connect with other martial artists in your area
             </p>
             <Link href="/explore">
-              <Button className="w-full bg-accent hover:bg-accent/90 text-white">
-                Explore Community 🚀
+              <Button variant="secondary" className="w-full bg-secondary hover:bg-secondary/90 text-white">
+                Explore Community 🔍
               </Button>
             </Link>
           </CardContent>
@@ -107,16 +111,16 @@ export default function Home() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Star className="h-5 w-5 text-accent" />
-              Top Rated Members
+              Rate & Review
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground mb-4">
-              See who's making an impact in the community
+            <p className="text-sm text-muted-foreground mb-4">
+              Share your training experiences with others
             </p>
             <Link href="/ratings">
-              <Button variant="outline" className="w-full border-accent text-accent hover:bg-accent hover:text-white">
-                View Rankings 🏆
+              <Button variant="secondary" className="w-full bg-secondary hover:bg-secondary/90 text-white">
+                View Ratings ⭐
               </Button>
             </Link>
           </CardContent>
@@ -130,8 +134,8 @@ export default function Home() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground mb-4">
-              Access your training journal, media gallery, and notes
+            <p className="text-sm text-muted-foreground mb-4">
+              Manage your profile and training journal
             </p>
             <Link href="/my-profile">
               <Button variant="secondary" className="w-full bg-secondary hover:bg-secondary/90 text-white">
@@ -143,7 +147,7 @@ export default function Home() {
       </div>
 
       {/* Recent Community Members */}
-      {recentUsers && recentUsers.length > 0 && (
+      {recentUsers && Array.isArray(recentUsers) && recentUsers.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Recent Community Members</CardTitle>
@@ -154,25 +158,22 @@ export default function Home() {
                 <div key={member.id} className="text-center">
                   <div className="mb-3">
                     <img 
-                      src={member.profileImageUrl || `https://ui-avatars.com/api/?name=${member.firstName}+${member.lastName}`}
-                      alt={`${member.firstName} ${member.lastName}`}
-                      className="profile-avatar mx-auto"
+                      src={member.profileImageUrl || "/api/placeholder/64/64"}
+                      alt={member.firstName || "Member"}
+                      className="w-16 h-16 rounded-full mx-auto object-cover"
                     />
                   </div>
                   <h4 className="font-semibold text-sm">
-                    {member.firstName} {member.lastName}
+                    {member.firstName || "Member"} {member.lastName || ""}
                   </h4>
-                  {member.profile && (
-                    <div className="flex justify-center gap-1 mt-1">
-                      <Badge variant="secondary" className="text-xs">
-                        {member.profile.role}
-                      </Badge>
-                    </div>
-                  )}
-                  <div className="flex items-center justify-center gap-1 mt-2 text-xs text-muted-foreground">
-                    <MapPin className="h-3 w-3" />
-                    {member.profile?.location || 'Unknown'}
-                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {member.profile?.role || "Member"}
+                  </p>
+                  <Link href={`/profile/${member.id}`}>
+                    <Button variant="ghost" size="sm" className="mt-2">
+                      View Profile
+                    </Button>
+                  </Link>
                 </div>
               ))}
             </div>
