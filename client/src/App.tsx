@@ -30,26 +30,29 @@ function Router() {
     );
   }
 
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Route path="/" component={Landing} />
+        <Route component={NotFound} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
-      <Switch>
-        {!isAuthenticated ? (
-          <Route path="/" component={Landing} />
-        ) : (
-          <>
-            <Navbar />
-            <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900">
-              <Route path="/" component={Home} />
-              <Route path="/explore" component={Explore} />
-              <Route path="/profile/:id" component={ProfileDetail} />
-              <Route path="/profile-edit" component={ProfileEdit} />
-              <Route path="/my-profile" component={MyProfile} />
-              <Route path="/ratings" component={Ratings} />
-            </main>
-          </>
-        )}
-        <Route component={NotFound} />
-      </Switch>
+      <Navbar />
+      <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900 pt-16">
+        <Switch>
+          <Route path="/" component={Home} />
+          <Route path="/explore" component={Explore} />
+          <Route path="/profile/:id" component={ProfileDetail} />
+          <Route path="/profile-edit" component={ProfileEdit} />
+          <Route path="/my-profile" component={MyProfile} />
+          <Route path="/ratings" component={Ratings} />
+          <Route component={NotFound} />
+        </Switch>
+      </main>
     </div>
   );
 }

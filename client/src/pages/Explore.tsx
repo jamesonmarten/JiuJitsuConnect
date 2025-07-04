@@ -13,8 +13,8 @@ export default function Explore() {
   const [filters, setFilters] = useState({
     search: "",
     location: "",
-    role: "",
-    skillLevel: "",
+    role: "all",
+    skillLevel: "all",
   });
 
   const { data: users = [], isLoading } = useQuery<UserWithProfile[]>({
@@ -84,7 +84,7 @@ export default function Explore() {
                 <SelectValue placeholder="Role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Roles</SelectItem>
+                <SelectItem value="all">All Roles</SelectItem>
                 <SelectItem value="member">Member</SelectItem>
                 <SelectItem value="instructor">Instructor</SelectItem>
               </SelectContent>
@@ -94,7 +94,7 @@ export default function Explore() {
                 <SelectValue placeholder="Skill Level" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Levels</SelectItem>
+                <SelectItem value="all">All Levels</SelectItem>
                 <SelectItem value="beginner">Beginner</SelectItem>
                 <SelectItem value="intermediate">Intermediate</SelectItem>
                 <SelectItem value="advanced">Advanced</SelectItem>
