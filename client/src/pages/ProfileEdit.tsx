@@ -1,353 +1,381 @@
-import { useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { insertProfileSchema } from "@shared/schema";
-import { apiRequest } from "@/lib/queryClient";
-import { useLocation } from "wouter";
-import { z } from "zod";
-
-const profileFormSchema = insertProfileSchema.extend({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().optional(),
-});
-
-type ProfileFormData = z.infer<typeof profileFormSchema>;
+import { Save, ArrowLeft } from "lucide-react";
+import { Link } from "wouter";
 
 export default function ProfileEdit() {
   const { user } = useAuth();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [, navigate] = useLocation();
 
-  const { data: profile, isLoading } = useQuery({
-    queryKey: ["/api/profiles/me"],
-    enabled: !!user,
+  const [formData, setFormData] = useState({
+    role: user?.profile?.role || "",
+    skillLevel: user?.profile?.skillLevel || "",
+    gymAffiliation: user?.profile?.gymAffiliation || "",
+    location: user?.profile?.location || "",
+    beltRank: user?.profile?.beltRank || "",
+    bio: user?.profile?.bio || "",
+    trainingGoals: user?.profile?.trainingGoals || "",
+    availability: user?.profile?.availability || "",
   });
 
-  const form = useForm<ProfileFormData>({
-    resolver: zodResolver(profileFormSchema),
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
-      role: "member",
-      skillLevel: "beginner",
-      gymAffiliation: "",
-      location: "",
-      beltRank: "",
-      experience: "",
-      about: "",
-    },
-  });
+  console.log("ProfileEdit rendering with user:", user);
 
-  useEffect(() => {
-    if (user && profile) {
-      form.reset({
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
-        email: user.email || "",
-        phone: profile.phone || "",
-        role: profile.role || "member",
-        skillLevel: profile.skillLevel || "beginner",
-        gymAffiliation: profile.gymAffiliation || "",
-        location: profile.location || "",
-        beltRank: profile.beltRank || "",
-        experience: profile.experience || "",
-        about: profile.about || "",
-      });
-    } else if (user && !profile) {
-      form.reset({
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
-        email: user.email || "",
-        phone: "",
-        role: "member",
-        skillLevel: "beginner",
-        gymAffiliation: "",
-        location: "",
-        beltRank: "",
-        experience: "",
-        about: "",
-      });
-    }
-  }, [user, profile, form]);
-
-  const updateProfileMutation = useMutation({
-    mutationFn: async (data: ProfileFormData) => {
-      const { firstName, lastName, email, phone, ...profileData } = data;
-      
-      // Update profile
-      const method = profile ? "PUT" : "POST";
-      await apiRequest(method, "/api/profiles", profileData);
-      
-      return data;
-    },
-    onSuccess: () => {
-      toast({
-        title: "Profile updated successfully",
-        description: "Your profile has been saved.",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/profiles/me"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      navigate("/");
-    },
-    onError: (error) => {
-      toast({
-        title: "Error updating profile",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const onSubmit = (data: ProfileFormData) => {
-    updateProfileMutation.mutate(data);
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse">
-          <div className="max-w-2xl mx-auto bg-muted rounded-lg h-96"></div>
-        </div>
-      </div>
-    );
-  }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Form submitted:", formData);
+    // TODO: Implement form submission
+  };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-2xl mx-auto">
-        <Card>
-          <CardHeader>
-            <CardTitle>Edit Profile</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="firstName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>First Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="lastName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Last Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+    <div style={{ 
+      minHeight: '100vh', 
+      backgroundColor: 'hsl(210, 20%, 98%)', 
+      color: 'hsl(210, 24%, 16%)',
+      padding: '2rem'
+    }}>
+      <div className="container mx-auto max-w-2xl">
+        {/* Header */}
+        <div style={{ marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+            <Link href="/my-profile">
+              <button style={{
+                backgroundColor: 'white',
+                color: 'hsl(210, 65%, 26%)',
+                border: '1px solid hsl(214, 32%, 91%)',
+                borderRadius: '0.375rem',
+                padding: '0.5rem',
+                fontSize: '0.875rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center'
+              }}>
+                <ArrowLeft size={16} />
+              </button>
+            </Link>
+            <h1 style={{ 
+              fontSize: '2.5rem', 
+              fontWeight: 'bold',
+              color: 'hsl(210, 24%, 16%)'
+            }}>
+              Edit Profile ✏️
+            </h1>
+          </div>
+          <p style={{ 
+            color: 'hsl(215, 16%, 47%)', 
+            fontSize: '1.125rem' 
+          }}>
+            Update your training information to connect with the community
+          </p>
+        </div>
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input {...field} type="email" disabled />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone</FormLabel>
-                        <FormControl>
-                          <Input {...field} type="tel" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+        {/* Profile Form */}
+        <div style={{ 
+          backgroundColor: 'white', 
+          border: '1px solid hsl(214, 32%, 91%)',
+          borderRadius: '0.5rem',
+          padding: '2rem'
+        }}>
+          <form onSubmit={handleSubmit}>
+            <div style={{ display: 'grid', gap: '1.5rem' }}>
+              {/* Role */}
+              <div>
+                <label style={{ 
+                  display: 'block', 
+                  fontSize: '0.875rem', 
+                  fontWeight: '500',
+                  marginBottom: '0.5rem',
+                  color: 'hsl(210, 24%, 16%)'
+                }}>
+                  Role *
+                </label>
+                <select
+                  value={formData.role}
+                  onChange={(e) => handleInputChange('role', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    border: '1px solid hsl(214, 32%, 91%)',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.875rem',
+                    backgroundColor: 'white'
+                  }}
+                >
+                  <option value="">Select your role</option>
+                  <option value="member">Member</option>
+                  <option value="instructor">Instructor</option>
+                </select>
+              </div>
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="role"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Role</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select role" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="member">Member</SelectItem>
-                            <SelectItem value="instructor">Instructor</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="skillLevel"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Skill Level</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select skill level" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="beginner">Beginner</SelectItem>
-                            <SelectItem value="intermediate">Intermediate</SelectItem>
-                            <SelectItem value="advanced">Advanced</SelectItem>
-                            <SelectItem value="expert">Expert</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+              {/* Skill Level */}
+              <div>
+                <label style={{ 
+                  display: 'block', 
+                  fontSize: '0.875rem', 
+                  fontWeight: '500',
+                  marginBottom: '0.5rem',
+                  color: 'hsl(210, 24%, 16%)'
+                }}>
+                  Skill Level *
+                </label>
+                <select
+                  value={formData.skillLevel}
+                  onChange={(e) => handleInputChange('skillLevel', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    border: '1px solid hsl(214, 32%, 91%)',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.875rem',
+                    backgroundColor: 'white'
+                  }}
+                >
+                  <option value="">Select your skill level</option>
+                  <option value="beginner">Beginner (0-2 years)</option>
+                  <option value="intermediate">Intermediate (2-5 years)</option>
+                  <option value="advanced">Advanced (5+ years)</option>
+                </select>
+              </div>
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="gymAffiliation"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Gym Affiliation</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="location"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Location</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select location" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="longwood">Longwood</SelectItem>
-                            <SelectItem value="orlando">Orlando</SelectItem>
-                            <SelectItem value="winter-park">Winter Park</SelectItem>
-                            <SelectItem value="lake-mary">Lake Mary</SelectItem>
-                            <SelectItem value="altamonte">Altamonte Springs</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+              {/* Location */}
+              <div>
+                <label style={{ 
+                  display: 'block', 
+                  fontSize: '0.875rem', 
+                  fontWeight: '500',
+                  marginBottom: '0.5rem',
+                  color: 'hsl(210, 24%, 16%)'
+                }}>
+                  Location *
+                </label>
+                <select
+                  value={formData.location}
+                  onChange={(e) => handleInputChange('location', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    border: '1px solid hsl(214, 32%, 91%)',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.875rem',
+                    backgroundColor: 'white'
+                  }}
+                >
+                  <option value="">Select your location</option>
+                  <option value="longwood">Longwood</option>
+                  <option value="orlando">Orlando</option>
+                  <option value="winter-park">Winter Park</option>
+                  <option value="altamonte-springs">Altamonte Springs</option>
+                  <option value="casselberry">Casselberry</option>
+                  <option value="lake-mary">Lake Mary</option>
+                </select>
+              </div>
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="beltRank"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Belt Rank</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="e.g., White Belt, Blue Belt" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="experience"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Experience</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="e.g., 2 years, 5 years" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="about"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>About</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          {...field} 
-                          rows={4}
-                          placeholder="Tell us about yourself, your training goals, and what you're looking for in the community..."
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+              {/* Gym Affiliation */}
+              <div>
+                <label style={{ 
+                  display: 'block', 
+                  fontSize: '0.875rem', 
+                  fontWeight: '500',
+                  marginBottom: '0.5rem',
+                  color: 'hsl(210, 24%, 16%)'
+                }}>
+                  Gym/School Affiliation
+                </label>
+                <input
+                  type="text"
+                  value={formData.gymAffiliation}
+                  onChange={(e) => handleInputChange('gymAffiliation', e.target.value)}
+                  placeholder="e.g., Orlando BJJ Academy"
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    border: '1px solid hsl(214, 32%, 91%)',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.875rem'
+                  }}
                 />
+              </div>
 
-                <div className="flex justify-end gap-4">
-                  <Button 
-                    type="button" 
-                    variant="outline"
-                    onClick={() => navigate("/")}
-                  >
-                    Cancel
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    disabled={updateProfileMutation.isPending}
-                  >
-                    {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+              {/* Belt Rank */}
+              <div>
+                <label style={{ 
+                  display: 'block', 
+                  fontSize: '0.875rem', 
+                  fontWeight: '500',
+                  marginBottom: '0.5rem',
+                  color: 'hsl(210, 24%, 16%)'
+                }}>
+                  Belt Rank
+                </label>
+                <select
+                  value={formData.beltRank}
+                  onChange={(e) => handleInputChange('beltRank', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    border: '1px solid hsl(214, 32%, 91%)',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.875rem',
+                    backgroundColor: 'white'
+                  }}
+                >
+                  <option value="">Select your belt rank</option>
+                  <option value="white">White Belt</option>
+                  <option value="blue">Blue Belt</option>
+                  <option value="purple">Purple Belt</option>
+                  <option value="brown">Brown Belt</option>
+                  <option value="black">Black Belt</option>
+                </select>
+              </div>
+
+              {/* Bio */}
+              <div>
+                <label style={{ 
+                  display: 'block', 
+                  fontSize: '0.875rem', 
+                  fontWeight: '500',
+                  marginBottom: '0.5rem',
+                  color: 'hsl(210, 24%, 16%)'
+                }}>
+                  Bio
+                </label>
+                <textarea
+                  value={formData.bio}
+                  onChange={(e) => handleInputChange('bio', e.target.value)}
+                  placeholder="Tell the community about yourself, your martial arts journey, and what you're looking for..."
+                  rows={4}
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    border: '1px solid hsl(214, 32%, 91%)',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.875rem',
+                    resize: 'vertical'
+                  }}
+                />
+              </div>
+
+              {/* Training Goals */}
+              <div>
+                <label style={{ 
+                  display: 'block', 
+                  fontSize: '0.875rem', 
+                  fontWeight: '500',
+                  marginBottom: '0.5rem',
+                  color: 'hsl(210, 24%, 16%)'
+                }}>
+                  Training Goals
+                </label>
+                <textarea
+                  value={formData.trainingGoals}
+                  onChange={(e) => handleInputChange('trainingGoals', e.target.value)}
+                  placeholder="What are your training goals? e.g., improve guard, prepare for competition, stay in shape..."
+                  rows={3}
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    border: '1px solid hsl(214, 32%, 91%)',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.875rem',
+                    resize: 'vertical'
+                  }}
+                />
+              </div>
+
+              {/* Availability */}
+              <div>
+                <label style={{ 
+                  display: 'block', 
+                  fontSize: '0.875rem', 
+                  fontWeight: '500',
+                  marginBottom: '0.5rem',
+                  color: 'hsl(210, 24%, 16%)'
+                }}>
+                  Training Availability
+                </label>
+                <textarea
+                  value={formData.availability}
+                  onChange={(e) => handleInputChange('availability', e.target.value)}
+                  placeholder="When are you usually available for training? e.g., Weekday evenings, Saturday mornings..."
+                  rows={2}
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    border: '1px solid hsl(214, 32%, 91%)',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.875rem',
+                    resize: 'vertical'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Submit Buttons */}
+            <div style={{ 
+              display: 'flex', 
+              gap: '1rem', 
+              justifyContent: 'flex-end',
+              marginTop: '2rem',
+              paddingTop: '1.5rem',
+              borderTop: '1px solid hsl(214, 32%, 91%)'
+            }}>
+              <Link href="/my-profile">
+                <button type="button" style={{
+                  backgroundColor: 'white',
+                  color: 'hsl(210, 65%, 26%)',
+                  border: '1px solid hsl(214, 32%, 91%)',
+                  borderRadius: '0.375rem',
+                  padding: '0.75rem 1.5rem',
+                  fontSize: '0.875rem',
+                  cursor: 'pointer'
+                }}>
+                  Cancel
+                </button>
+              </Link>
+              <button type="submit" style={{
+                backgroundColor: 'hsl(210, 65%, 26%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '0.375rem',
+                padding: '0.75rem 1.5rem',
+                fontSize: '0.875rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                <Save size={16} />
+                Save Profile
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* Debug Info */}
+        <div style={{ 
+          backgroundColor: 'white', 
+          border: '1px solid hsl(214, 32%, 91%)',
+          borderRadius: '0.5rem',
+          padding: '1.5rem',
+          marginTop: '2rem'
+        }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem' }}>
+            Debug Info
+          </h3>
+          <div style={{ fontSize: '0.875rem', color: 'hsl(215, 16%, 47%)' }}>
+            <p>User ID: {user?.id || "Not available"}</p>
+            <p>Current Profile: {user?.profile ? "Exists" : "None"}</p>
+            <p>Form Data: {JSON.stringify(formData, null, 2)}</p>
+          </div>
+        </div>
       </div>
     </div>
   );
