@@ -169,47 +169,12 @@ export default function ProfileEdit() {
                   }}
                 >
                   <option value="">Select your location</option>
-                  <optgroup label="Florida">
-                    <option value="miami">Miami</option>
-                    <option value="tampa">Tampa</option>
-                    <option value="orlando">Orlando</option>
-                    <option value="jacksonville">Jacksonville</option>
-                    <option value="fort-lauderdale">Fort Lauderdale</option>
-                    <option value="tallahassee">Tallahassee</option>
-                    <option value="gainesville">Gainesville</option>
-                    <option value="pensacola">Pensacola</option>
-                    <option value="west-palm-beach">West Palm Beach</option>
-                    <option value="fort-myers">Fort Myers</option>
-                    <option value="longwood">Longwood</option>
-                    <option value="winter-park">Winter Park</option>
-                    <option value="altamonte-springs">Altamonte Springs</option>
-                    <option value="casselberry">Casselberry</option>
-                    <option value="lake-mary">Lake Mary</option>
-                  </optgroup>
-                  <optgroup label="Wisconsin">
-                    <option value="milwaukee">Milwaukee</option>
-                    <option value="madison">Madison</option>
-                    <option value="green-bay">Green Bay</option>
-                    <option value="kenosha">Kenosha</option>
-                    <option value="racine">Racine</option>
-                    <option value="appleton">Appleton</option>
-                    <option value="waukesha">Waukesha</option>
-                    <option value="eau-claire">Eau Claire</option>
-                    <option value="oshkosh">Oshkosh</option>
-                    <option value="janesville">Janesville</option>
-                  </optgroup>
-                  <optgroup label="Illinois">
-                    <option value="chicago">Chicago</option>
-                    <option value="aurora">Aurora</option>
-                    <option value="naperville">Naperville</option>
-                    <option value="joliet">Joliet</option>
-                    <option value="rockford">Rockford</option>
-                    <option value="elgin">Elgin</option>
-                    <option value="peoria">Peoria</option>
-                    <option value="champaign">Champaign</option>
-                    <option value="waukegan">Waukegan</option>
-                    <option value="cicero">Cicero</option>
-                  </optgroup>
+                  <option value="longwood">Longwood</option>
+                  <option value="orlando">Orlando</option>
+                  <option value="winter-park">Winter Park</option>
+                  <option value="altamonte-springs">Altamonte Springs</option>
+                  <option value="casselberry">Casselberry</option>
+                  <option value="lake-mary">Lake Mary</option>
                 </select>
               </div>
 

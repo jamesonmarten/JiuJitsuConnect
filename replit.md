@@ -2,7 +2,7 @@
 
 ## Overview
 
-Grapplr is a full-stack web application built to connect the Jiu-Jitsu community across Florida, Wisconsin, and Illinois. The platform allows users to find training partners, instructors, and rate their training experiences. It's built with modern web technologies and follows a client-server architecture with PostgreSQL for data persistence.
+Grapplr is a full-stack web application built to connect the Jiu-Jitsu community in Longwood, Orlando, and surrounding areas. The platform allows users to find training partners, instructors, and rate their training experiences. It's built with modern web technologies and follows a client-server architecture with PostgreSQL for data persistence.
 
 ## System Architecture
 
@@ -112,12 +112,5 @@ Preferred communication style: Simple, everyday language.
 
 ## Changelog
 
-- July 04, 2025: Initial setup and project architecture
-- July 04, 2025: Fixed critical rendering issue where authenticated pages appeared blank after login
-  - Resolved router structure problem causing page components to not display
-  - Restored all subpages with proper professional styling
-  - All authentication flows and navigation now working correctly
-- July 04, 2025: Expanded geographic coverage from Orlando/Longwood to major cities across Florida, Wisconsin, and Illinois
-  - Updated city selectors in Explore and ProfileEdit pages with comprehensive multi-state options
-  - Updated Landing page and Explore page headers to reflect expanded coverage
-  - Now serves 35+ major cities across three states
+Changelog:
+- July 04, 2025. Initial setup

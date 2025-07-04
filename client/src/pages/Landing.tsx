@@ -13,7 +13,7 @@ export default function Landing() {
                 Connect with the Jiu-Jitsu Community 🥋
               </h1>
               <p className="text-xl mb-8 opacity-90">
-                Find training partners, instructors, and gyms across Florida, Wisconsin, and Illinois. 
+                Find training partners, instructors, and gyms in Longwood, Orlando, and surrounding areas. 
                 Track your progress, share your journey, and build your martial arts network today.
               </p>
               <div className="flex gap-4">
