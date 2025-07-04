@@ -123,79 +123,124 @@ export default function Explore() {
             </span>
           </div>
 
-          {isLoading ? (
-            <div className="grid md:grid-cols-2 gap-4">
-              {[...Array(6)].map((_, i) => (
-                <Card key={i} className="animate-pulse">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-20 h-20 bg-muted rounded-full"></div>
-                      <div className="flex-1">
-                        <div className="h-4 bg-muted rounded mb-2"></div>
-                        <div className="h-3 bg-muted rounded w-2/3"></div>
-                      </div>
-                    </div>
-                    <div className="h-8 bg-muted rounded"></div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : users && users.length === 0 ? (
-            <Card>
-              <CardContent className="p-12 text-center">
-                <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <div className="text-muted-foreground mb-4">
+          <div style={{ 
+            backgroundColor: 'white', 
+            border: '1px solid hsl(214, 32%, 91%)',
+            borderRadius: '0.5rem',
+            padding: '3rem',
+            textAlign: 'center'
+          }}>
+            {isLoading ? (
+              <div>
+                <div style={{ fontSize: '1.125rem', marginBottom: '1rem' }}>Loading community members...</div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} style={{ 
+                      backgroundColor: 'hsl(210, 40%, 96%)', 
+                      height: '200px', 
+                      borderRadius: '0.5rem',
+                      animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    }}></div>
+                  ))}
+                </div>
+              </div>
+            ) : users && Array.isArray(users) && users.length === 0 ? (
+              <div>
+                <Users size={48} style={{ color: 'hsl(215, 16%, 47%)', margin: '0 auto 1rem auto' }} />
+                <div style={{ color: 'hsl(215, 16%, 47%)', marginBottom: '1rem' }}>
                   No members found matching your criteria
                 </div>
-                <Button 
-                  variant="outline" 
+                <button 
+                  style={{
+                    backgroundColor: 'hsl(210, 65%, 26%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '0.375rem',
+                    padding: '0.5rem 1rem',
+                    cursor: 'pointer'
+                  }}
                   onClick={() => setFilters({ search: "", location: "", role: "", skillLevel: "" })}
                 >
                   Clear Filters
-                </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid md:grid-cols-2 gap-4">
-              {users?.map((user: any) => (
-                <Card key={user.id} className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-4 mb-4">
-                      <img 
-                        src={user.profileImageUrl || "/api/placeholder/80/80"}
-                        alt={user.firstName || "Member"}
-                        className="w-20 h-20 rounded-full object-cover"
-                      />
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg">
-                          {user.firstName || "Member"} {user.lastName || ""}
-                        </h3>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <MapPin className="h-4 w-4" />
-                          {user.profile?.location || "Location not set"}
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Star className="h-4 w-4" />
-                          {user.profile?.skillLevel || "Skill level not set"}
+                </button>
+              </div>
+            ) : (
+              <div>
+                <div style={{ marginBottom: '2rem' }}>
+                  <div style={{ fontSize: '1.125rem', marginBottom: '1rem' }}>
+                    Found {Array.isArray(users) ? users.length : 0} community members
+                  </div>
+                </div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                  {Array.isArray(users) && users.slice(0, 6).map((user: any) => (
+                    <div key={user.id} style={{ 
+                      backgroundColor: 'white', 
+                      border: '1px solid hsl(214, 32%, 91%)',
+                      borderRadius: '0.5rem',
+                      padding: '1.5rem',
+                      boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                        <img 
+                          src={user.profileImageUrl || "https://via.placeholder.com/80x80?text=👤"}
+                          alt={user.firstName || "Member"}
+                          style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover' }}
+                        />
+                        <div style={{ flex: '1' }}>
+                          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem' }}>
+                            {user.firstName || "Member"} {user.lastName || ""}
+                          </h3>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'hsl(215, 16%, 47%)', marginBottom: '0.25rem' }}>
+                            <MapPin size={16} />
+                            {user.profile?.location || "Location not set"}
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'hsl(215, 16%, 47%)' }}>
+                            <Star size={16} />
+                            {user.profile?.skillLevel || "Skill level not set"}
+                          </div>
                         </div>
                       </div>
+                      
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <Link href={`/profile/${user.id}`} style={{ flex: '1' }}>
+                          <button style={{
+                            width: '100%',
+                            backgroundColor: 'white',
+                            color: 'hsl(210, 65%, 26%)',
+                            border: '1px solid hsl(214, 32%, 91%)',
+                            borderRadius: '0.375rem',
+                            padding: '0.5rem 1rem',
+                            fontSize: '0.875rem',
+                            cursor: 'pointer'
+                          }}>
+                            View Profile
+                          </button>
+                        </Link>
+                        <button style={{
+                          backgroundColor: 'hsl(210, 65%, 26%)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '0.375rem',
+                          padding: '0.5rem 0.75rem',
+                          fontSize: '0.875rem',
+                          cursor: 'pointer'
+                        }}>
+                          Contact
+                        </button>
+                      </div>
                     </div>
-                    
-                    <div className="flex gap-2">
-                      <Link href={`/profile/${user.id}`} className="flex-1">
-                        <Button variant="outline" className="w-full">
-                          View Profile
-                        </Button>
-                      </Link>
-                      <Button size="sm" className="px-3">
-                        Contact
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+                  ))}
+                </div>
+                
+                {Array.isArray(users) && users.length === 0 && (
+                  <div style={{ marginTop: '2rem', color: 'hsl(215, 16%, 47%)' }}>
+                    No members in the community yet. Be the first to join!
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

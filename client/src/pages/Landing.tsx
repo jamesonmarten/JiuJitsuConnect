@@ -21,7 +21,7 @@ export default function Landing() {
                   size="lg" 
                   variant="secondary"
                   onClick={() => window.location.href = '/api/login'}
-                  className="bg-white text-primary hover:bg-gray-100"
+                  className="bg-white text-black hover:bg-gray-100"
                 >
                   <Users className="mr-2 h-5 w-5" />
                   Get Started
