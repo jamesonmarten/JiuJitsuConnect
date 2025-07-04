@@ -68,8 +68,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // User routes
-  app.get('/api/users', isAuthenticated, async (req: any, res) => {
+  // User routes (public for basic listings)
+  app.get('/api/users', async (req: any, res) => {
     try {
       const filters = {
         search: req.query.search as string,
@@ -102,7 +102,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Rating routes
+  // Rating routes (public stats first)
+  app.get('/api/ratings/stats', async (req: any, res) => {
+    try {
+      const stats = await storage.getRatingStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching rating stats:", error);
+      res.status(500).json({ message: "Failed to fetch rating stats" });
+    }
+  });
+
+  app.get('/api/ratings/top-rated', async (req: any, res) => {
+    try {
+      const topUsers = await storage.getTopRatedUsers();
+      res.json(topUsers);
+    } catch (error) {
+      console.error("Error fetching top rated users:", error);
+      res.status(500).json({ message: "Failed to fetch top rated users" });
+    }
+  });
+
   app.post('/api/ratings', isAuthenticated, async (req: any, res) => {
     try {
       const fromUserId = req.user.claims.sub;
@@ -138,26 +158,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching ratings:", error);
       res.status(500).json({ message: "Failed to fetch ratings" });
-    }
-  });
-
-  app.get('/api/ratings/stats', isAuthenticated, async (req: any, res) => {
-    try {
-      const stats = await storage.getRatingStats();
-      res.json(stats);
-    } catch (error) {
-      console.error("Error fetching rating stats:", error);
-      res.status(500).json({ message: "Failed to fetch rating stats" });
-    }
-  });
-
-  app.get('/api/ratings/top-rated', isAuthenticated, async (req: any, res) => {
-    try {
-      const topUsers = await storage.getTopRatedUsers();
-      res.json(topUsers);
-    } catch (error) {
-      console.error("Error fetching top rated users:", error);
-      res.status(500).json({ message: "Failed to fetch top rated users" });
     }
   });
 

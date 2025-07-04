@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Users, Star, MapPin } from "lucide-react";
+import { Users, Star, MapPin, Camera, Book, Award } from "lucide-react";
 
 export default function Landing() {
   return (
@@ -10,11 +10,11 @@ export default function Landing() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h1 className="text-4xl lg:text-6xl font-bold mb-6">
-                Connect with the Jiu-Jitsu Community
+                Connect with the Jiu-Jitsu Community 🥋
               </h1>
               <p className="text-xl mb-8 opacity-90">
                 Find training partners, instructors, and gyms in Longwood, Orlando, and surrounding areas. 
-                Build your martial arts network today.
+                Track your progress, share your journey, and build your martial arts network today.
               </p>
               <div className="flex gap-4">
                 <Button 
@@ -49,9 +49,10 @@ export default function Landing() {
 
       {/* Features Section */}
       <div className="container mx-auto px-4 py-20">
-        <div className="grid md:grid-cols-3 gap-8">
+        <h2 className="text-3xl font-bold text-center mb-12">What Makes Grapplr Special</h2>
+        <div className="grid md:grid-cols-3 gap-8 mb-16">
           <div className="text-center">
-            <div className="bg-primary rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+            <div className="bg-accent rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
               <Users className="h-8 w-8 text-white" />
             </div>
             <h3 className="text-xl font-semibold mb-3">Find Training Partners</h3>
@@ -60,7 +61,7 @@ export default function Landing() {
             </p>
           </div>
           <div className="text-center">
-            <div className="bg-primary rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+            <div className="bg-accent rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
               <Star className="h-8 w-8 text-white" />
             </div>
             <h3 className="text-xl font-semibold mb-3">Rate & Review</h3>
@@ -69,13 +70,47 @@ export default function Landing() {
             </p>
           </div>
           <div className="text-center">
-            <div className="bg-primary rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+            <div className="bg-accent rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
               <MapPin className="h-8 w-8 text-white" />
             </div>
             <h3 className="text-xl font-semibold mb-3">Local Focus</h3>
             <p className="text-muted-foreground">
               Specifically designed for the Longwood, Orlando, and surrounding Central Florida area.
             </p>
+          </div>
+        </div>
+
+        {/* Enhanced Features */}
+        <div className="bg-card rounded-xl p-8 border">
+          <h3 className="text-2xl font-bold text-center mb-8">Enhanced Profile Features</h3>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="bg-secondary rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Book className="h-8 w-8 text-white" />
+              </div>
+              <h4 className="text-lg font-semibold mb-2">Training Journal</h4>
+              <p className="text-muted-foreground text-sm">
+                Track your progress, mood, and training sessions with detailed personal notes.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="bg-secondary rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Camera className="h-8 w-8 text-white" />
+              </div>
+              <h4 className="text-lg font-semibold mb-2">Media Gallery</h4>
+              <p className="text-muted-foreground text-sm">
+                Upload photos and videos from sparring sessions with technique tagging.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="bg-secondary rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Award className="h-8 w-8 text-white" />
+              </div>
+              <h4 className="text-lg font-semibold mb-2">Instructor Notes</h4>
+              <p className="text-muted-foreground text-sm">
+                Receive personalized feedback and progress notes from your instructors.
+              </p>
+            </div>
           </div>
         </div>
       </div>

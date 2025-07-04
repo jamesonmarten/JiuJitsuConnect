@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -106,11 +108,11 @@
   }
 
   .stats-card {
-    @apply bg-card rounded-xl p-5 text-center shadow-sm;
+    @apply bg-card rounded-xl p-5 text-center shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105 border-l-4 border-accent border-opacity-30 hover:border-opacity-80;
   }
 
   .stats-number {
-    @apply text-3xl font-bold text-primary;
+    @apply text-3xl font-bold text-primary bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent;
   }
 
   .rating-interactive {
@@ -122,8 +124,23 @@
   }
 
   .navbar-brand {
-    @apply text-primary font-bold text-2xl;
+    @apply text-primary font-bold text-2xl bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent;
+  }
+
+  .action-card {
+    @apply bg-gradient-to-br from-card to-card transition-all duration-300 hover:scale-105 border border-accent border-opacity-20 hover:border-opacity-60;
+  }
+
+  .welcome-title {
+    @apply text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent;
+  }
+
+  .floating {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
   }
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');

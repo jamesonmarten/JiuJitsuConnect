@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, Star, MapPin, Plus } from "lucide-react";
+import { Users, Star, MapPin, Plus, User } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Home() {
@@ -27,12 +27,12 @@ export default function Home() {
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Welcome Section */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">
-          Welcome back, {user?.firstName || 'Fighter'}!
+      <div className="mb-8 text-center">
+        <h1 className="welcome-title mb-4 floating">
+          Welcome back, {user?.firstName || 'Fighter'}! 🥋
         </h1>
-        <p className="text-muted-foreground">
-          Connect with the Jiu-Jitsu community in your area
+        <p className="text-muted-foreground text-lg">
+          Connect with the Jiu-Jitsu community in Longwood & Orlando
         </p>
       </div>
 
@@ -83,11 +83,11 @@ export default function Home() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
-        <Card>
+      <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <Card className="action-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
+              <Users className="h-5 w-5 text-accent" />
               Find Training Partners
             </CardTitle>
           </CardHeader>
@@ -96,17 +96,17 @@ export default function Home() {
               Discover martial artists in your area and skill level
             </p>
             <Link href="/explore">
-              <Button className="w-full">
-                Explore Community
+              <Button className="w-full bg-accent hover:bg-accent/90 text-white">
+                Explore Community 🚀
               </Button>
             </Link>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="action-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Star className="h-5 w-5" />
+              <Star className="h-5 w-5 text-accent" />
               Top Rated Members
             </CardTitle>
           </CardHeader>
@@ -115,8 +115,27 @@ export default function Home() {
               See who's making an impact in the community
             </p>
             <Link href="/ratings">
-              <Button variant="outline" className="w-full">
-                View Rankings
+              <Button variant="outline" className="w-full border-accent text-accent hover:bg-accent hover:text-white">
+                View Rankings 🏆
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card className="action-card">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="h-5 w-5 text-accent" />
+              My Profile
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              Access your training journal, media gallery, and notes
+            </p>
+            <Link href="/my-profile">
+              <Button variant="secondary" className="w-full bg-secondary hover:bg-secondary/90 text-white">
+                View Profile 👤
               </Button>
             </Link>
           </CardContent>
