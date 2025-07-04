@@ -36,9 +36,22 @@ function Router() {
         {!isAuthenticated ? (
           <Route path="/" component={Landing} />
         ) : (
-          <>
+          <div style={{ 
+            backgroundColor: 'cyan', 
+            color: 'black', 
+            padding: '20px', 
+            fontSize: '24px',
+            fontWeight: 'bold',
+            minHeight: '100vh'
+          }}>
+            <div style={{ backgroundColor: 'magenta', padding: '20px', margin: '10px' }}>
+              AUTHENTICATED USER DETECTED - {new Date().toLocaleTimeString()}
+            </div>
             <Navbar />
-            <main style={{ paddingTop: '1rem', minHeight: '100vh', backgroundColor: 'hsl(210, 20%, 98%)' }}>
+            <main style={{ paddingTop: '1rem', minHeight: '100vh', backgroundColor: 'lime' }}>
+              <div style={{ backgroundColor: 'red', color: 'white', padding: '20px', margin: '10px' }}>
+                MAIN CONTENT AREA - {new Date().toLocaleTimeString()}
+              </div>
               <Route path="/" component={Home} />
               <Route path="/explore" component={Explore} />
               <Route path="/profile/:id" component={ProfileDetail} />
@@ -46,7 +59,7 @@ function Router() {
               <Route path="/my-profile" component={MyProfile} />
               <Route path="/ratings" component={Ratings} />
             </main>
-          </>
+          </div>
         )}
         <Route component={NotFound} />
       </Switch>
