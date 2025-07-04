@@ -1,0 +1,289 @@
+import {
+  users,
+  profiles,
+  ratings,
+  type User,
+  type UpsertUser,
+  type Profile,
+  type InsertProfile,
+  type Rating,
+  type InsertRating,
+  type UserWithProfile,
+} from "@shared/schema";
+import { db } from "./db";
+import { eq, and, or, ilike, avg, count, desc } from "drizzle-orm";
+
+export interface IStorage {
+  // User operations (mandatory for Replit Auth)
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
+  
+  // Profile operations
+  getUserWithProfile(id: string): Promise<UserWithProfile | undefined>;
+  getUsersWithProfiles(filters?: {
+    search?: string;
+    location?: string;
+    role?: string;
+    skillLevel?: string;
+  }): Promise<UserWithProfile[]>;
+  createProfile(profile: InsertProfile): Promise<Profile>;
+  updateProfile(userId: string, profile: Partial<InsertProfile>): Promise<Profile>;
+  getProfileByUserId(userId: string): Promise<Profile | undefined>;
+  
+  // Rating operations
+  createRating(rating: InsertRating): Promise<Rating>;
+  getRatingsForUser(userId: string): Promise<Rating[]>;
+  getUserRating(fromUserId: string, toUserId: string): Promise<Rating | undefined>;
+  getTopRatedUsers(): Promise<UserWithProfile[]>;
+  getRatingStats(): Promise<{
+    averageRating: number;
+    totalReviews: number;
+    activeMembers: number;
+  }>;
+}
+
+export class DatabaseStorage implements IStorage {
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
+  }
+
+  async getUserWithProfile(id: string): Promise<UserWithProfile | undefined> {
+    const result = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImageUrl: users.profileImageUrl,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+        profile: profiles,
+        averageRating: avg(ratings.rating),
+        ratingCount: count(ratings.id),
+      })
+      .from(users)
+      .leftJoin(profiles, eq(users.id, profiles.userId))
+      .leftJoin(ratings, eq(users.id, ratings.toUserId))
+      .where(eq(users.id, id))
+      .groupBy(users.id, profiles.id)
+      .limit(1);
+
+    if (result.length === 0) return undefined;
+
+    const user = result[0];
+    return {
+      ...user,
+      profile: user.profile,
+      averageRating: user.averageRating ? Number(user.averageRating) : undefined,
+      ratingCount: user.ratingCount || 0,
+    };
+  }
+
+  async getUsersWithProfiles(filters?: {
+    search?: string;
+    location?: string;
+    role?: string;
+    skillLevel?: string;
+  }): Promise<UserWithProfile[]> {
+    let query = db
+      .select({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImageUrl: users.profileImageUrl,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+        profile: profiles,
+        averageRating: avg(ratings.rating),
+        ratingCount: count(ratings.id),
+      })
+      .from(users)
+      .leftJoin(profiles, eq(users.id, profiles.userId))
+      .leftJoin(ratings, eq(users.id, ratings.toUserId));
+
+    const conditions = [];
+
+    if (filters?.search) {
+      conditions.push(
+        or(
+          ilike(users.firstName, `%${filters.search}%`),
+          ilike(users.lastName, `%${filters.search}%`)
+        )
+      );
+    }
+
+    if (filters?.location) {
+      conditions.push(eq(profiles.location, filters.location));
+    }
+
+    if (filters?.role) {
+      conditions.push(eq(profiles.role, filters.role));
+    }
+
+    if (filters?.skillLevel) {
+      conditions.push(eq(profiles.skillLevel, filters.skillLevel));
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+
+    const result = await query
+      .groupBy(users.id, profiles.id)
+      .having(eq(profiles.isActive, true))
+      .orderBy(desc(avg(ratings.rating)));
+
+    return result.map(user => ({
+      ...user,
+      profile: user.profile,
+      averageRating: user.averageRating ? Number(user.averageRating) : undefined,
+      ratingCount: user.ratingCount || 0,
+    }));
+  }
+
+  async createProfile(profile: InsertProfile): Promise<Profile> {
+    const [newProfile] = await db
+      .insert(profiles)
+      .values(profile)
+      .returning();
+    return newProfile;
+  }
+
+  async updateProfile(userId: string, profileData: Partial<InsertProfile>): Promise<Profile> {
+    const [updatedProfile] = await db
+      .update(profiles)
+      .set({ ...profileData, updatedAt: new Date() })
+      .where(eq(profiles.userId, userId))
+      .returning();
+    return updatedProfile;
+  }
+
+  async getProfileByUserId(userId: string): Promise<Profile | undefined> {
+    const [profile] = await db
+      .select()
+      .from(profiles)
+      .where(eq(profiles.userId, userId));
+    return profile;
+  }
+
+  async createRating(rating: InsertRating): Promise<Rating> {
+    const [newRating] = await db
+      .insert(ratings)
+      .values(rating)
+      .returning();
+    return newRating;
+  }
+
+  async getRatingsForUser(userId: string): Promise<Rating[]> {
+    const result = await db
+      .select({
+        id: ratings.id,
+        fromUserId: ratings.fromUserId,
+        toUserId: ratings.toUserId,
+        rating: ratings.rating,
+        review: ratings.review,
+        createdAt: ratings.createdAt,
+        fromUser: {
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImageUrl: users.profileImageUrl,
+        },
+      })
+      .from(ratings)
+      .leftJoin(users, eq(ratings.fromUserId, users.id))
+      .where(eq(ratings.toUserId, userId))
+      .orderBy(desc(ratings.createdAt));
+
+    return result.map(r => ({
+      ...r,
+      fromUser: r.fromUser,
+    })) as any;
+  }
+
+  async getUserRating(fromUserId: string, toUserId: string): Promise<Rating | undefined> {
+    const [rating] = await db
+      .select()
+      .from(ratings)
+      .where(and(
+        eq(ratings.fromUserId, fromUserId),
+        eq(ratings.toUserId, toUserId)
+      ));
+    return rating;
+  }
+
+  async getTopRatedUsers(): Promise<UserWithProfile[]> {
+    const result = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImageUrl: users.profileImageUrl,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+        profile: profiles,
+        averageRating: avg(ratings.rating),
+        ratingCount: count(ratings.id),
+      })
+      .from(users)
+      .leftJoin(profiles, eq(users.id, profiles.userId))
+      .leftJoin(ratings, eq(users.id, ratings.toUserId))
+      .where(eq(profiles.isActive, true))
+      .groupBy(users.id, profiles.id)
+      .having(count(ratings.id).gt(0))
+      .orderBy(desc(avg(ratings.rating)))
+      .limit(10);
+
+    return result.map(user => ({
+      ...user,
+      profile: user.profile,
+      averageRating: user.averageRating ? Number(user.averageRating) : undefined,
+      ratingCount: user.ratingCount || 0,
+    }));
+  }
+
+  async getRatingStats(): Promise<{
+    averageRating: number;
+    totalReviews: number;
+    activeMembers: number;
+  }> {
+    const [avgRating] = await db
+      .select({ avg: avg(ratings.rating) })
+      .from(ratings);
+
+    const [totalReviews] = await db
+      .select({ count: count(ratings.id) })
+      .from(ratings);
+
+    const [activeMembers] = await db
+      .select({ count: count(profiles.id) })
+      .from(profiles)
+      .where(eq(profiles.isActive, true));
+
+    return {
+      averageRating: avgRating.avg ? Number(avgRating.avg) : 0,
+      totalReviews: totalReviews.count || 0,
+      activeMembers: activeMembers.count || 0,
+    };
+  }
+}
+
+export const storage = new DatabaseStorage();
