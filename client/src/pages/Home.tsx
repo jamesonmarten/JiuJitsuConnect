@@ -10,7 +10,7 @@ export default function Home() {
   
   console.log("Home component rendering with user:", user);
 
-  const { data: stats, isLoading: statsLoading } = useQuery<{
+  const { data: stats, isLoading: statsLoading, error: statsError } = useQuery<{
     averageRating: number;
     totalReviews: number;
     activeMembers: number;
@@ -18,122 +18,245 @@ export default function Home() {
     queryKey: ["/api/ratings/stats"],
   });
 
-  console.log("Home stats:", { stats, statsLoading });
+  console.log("Home stats:", { stats, statsLoading, statsError });
 
+  // Force render with explicit styling
   return (
-    <div className="container mx-auto px-4 py-8 bg-background min-h-screen">
-      {/* Welcome Section */}
-      <div className="mb-8 text-center">
-        <h1 className="text-4xl font-bold mb-4 text-foreground">
-          Welcome back, Fighter! 🥋
-        </h1>
-        <p className="text-muted-foreground text-lg">
-          Connect with the Jiu-Jitsu community in Longwood & Orlando
-        </p>
-      </div>
+    <div style={{ 
+      minHeight: '100vh', 
+      backgroundColor: 'hsl(210, 20%, 98%)', 
+      color: 'hsl(210, 24%, 16%)',
+      padding: '2rem'
+    }}>
+      <div className="container mx-auto">
+        {/* Welcome Section - Always visible */}
+        <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
+          <h1 style={{ 
+            fontSize: '2.5rem', 
+            fontWeight: 'bold', 
+            marginBottom: '1rem',
+            color: 'hsl(210, 24%, 16%)'
+          }}>
+            Welcome back, {user?.firstName || 'Fighter'}! 🥋
+          </h1>
+          <p style={{ 
+            color: 'hsl(215, 16%, 47%)', 
+            fontSize: '1.125rem' 
+          }}>
+            Connect with the Jiu-Jitsu community in Longwood & Orlando
+          </p>
+        </div>
 
-      {/* Stats Cards */}
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
-        <Card className="border-border bg-card">
-          <CardContent className="p-6">
-            <div className="text-3xl font-bold text-primary">
+        {/* Stats Cards */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+          gap: '1.5rem',
+          marginBottom: '2rem'
+        }}>
+          <div style={{ 
+            backgroundColor: 'white', 
+            border: '1px solid hsl(214, 32%, 91%)',
+            borderRadius: '0.5rem',
+            padding: '1.5rem'
+          }}>
+            <div style={{ 
+              fontSize: '2rem', 
+              fontWeight: 'bold', 
+              color: 'hsl(210, 65%, 26%)' 
+            }}>
               {statsLoading ? "..." : (stats?.averageRating?.toFixed(1) || "0.0")}
             </div>
-            <div className="text-muted-foreground">Average Rating</div>
-          </CardContent>
-        </Card>
-        <Card className="border-border bg-card">
-          <CardContent className="p-6">
-            <div className="text-3xl font-bold text-primary">
+            <div style={{ color: 'hsl(215, 16%, 47%)' }}>Average Rating</div>
+          </div>
+          
+          <div style={{ 
+            backgroundColor: 'white', 
+            border: '1px solid hsl(214, 32%, 91%)',
+            borderRadius: '0.5rem',
+            padding: '1.5rem'
+          }}>
+            <div style={{ 
+              fontSize: '2rem', 
+              fontWeight: 'bold', 
+              color: 'hsl(210, 65%, 26%)' 
+            }}>
               {statsLoading ? "..." : (stats?.totalReviews || 0)}
             </div>
-            <div className="text-muted-foreground">Total Reviews</div>
-          </CardContent>
-        </Card>
-        <Card className="border-border bg-card">
-          <CardContent className="p-6">
-            <div className="text-3xl font-bold text-primary">
+            <div style={{ color: 'hsl(215, 16%, 47%)' }}>Total Reviews</div>
+          </div>
+          
+          <div style={{ 
+            backgroundColor: 'white', 
+            border: '1px solid hsl(214, 32%, 91%)',
+            borderRadius: '0.5rem',
+            padding: '1.5rem'
+          }}>
+            <div style={{ 
+              fontSize: '2rem', 
+              fontWeight: 'bold', 
+              color: 'hsl(210, 65%, 26%)' 
+            }}>
               {statsLoading ? "..." : (stats?.activeMembers || 0)}
             </div>
-            <div className="text-muted-foreground">Active Members</div>
-          </CardContent>
-        </Card>
-      </div>
+            <div style={{ color: 'hsl(215, 16%, 47%)' }}>Active Members</div>
+          </div>
+        </div>
 
-      {/* Quick Actions */}
-      <div className="grid md:grid-cols-3 gap-6">
-        <Card className="border-border bg-card hover:shadow-lg transition-shadow">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-primary" />
+        {/* Quick Actions */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+          gap: '1.5rem',
+          marginBottom: '2rem'
+        }}>
+          <div style={{ 
+            backgroundColor: 'white', 
+            border: '1px solid hsl(214, 32%, 91%)',
+            borderRadius: '0.5rem',
+            padding: '1.5rem'
+          }}>
+            <h3 style={{ 
+              fontSize: '1.25rem', 
+              fontWeight: '600', 
+              marginBottom: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              <Users size={20} style={{ color: 'hsl(210, 65%, 26%)' }} />
               Find Training Partners
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
+            </h3>
+            <p style={{ 
+              color: 'hsl(215, 16%, 47%)', 
+              fontSize: '0.875rem',
+              marginBottom: '1rem'
+            }}>
               Connect with other martial artists in your area
             </p>
             <Link href="/explore">
-              <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+              <button style={{
+                width: '100%',
+                backgroundColor: 'hsl(210, 65%, 26%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '0.375rem',
+                padding: '0.5rem 1rem',
+                fontSize: '0.875rem',
+                cursor: 'pointer'
+              }}>
                 Explore Community 🔍
-              </Button>
+              </button>
             </Link>
-          </CardContent>
-        </Card>
+          </div>
 
-        <Card className="border-border bg-card hover:shadow-lg transition-shadow">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Star className="h-5 w-5 text-primary" />
+          <div style={{ 
+            backgroundColor: 'white', 
+            border: '1px solid hsl(214, 32%, 91%)',
+            borderRadius: '0.5rem',
+            padding: '1.5rem'
+          }}>
+            <h3 style={{ 
+              fontSize: '1.25rem', 
+              fontWeight: '600', 
+              marginBottom: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              <Star size={20} style={{ color: 'hsl(210, 65%, 26%)' }} />
               Rate & Review
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
+            </h3>
+            <p style={{ 
+              color: 'hsl(215, 16%, 47%)', 
+              fontSize: '0.875rem',
+              marginBottom: '1rem'
+            }}>
               Share your training experiences with others
             </p>
             <Link href="/ratings">
-              <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+              <button style={{
+                width: '100%',
+                backgroundColor: 'hsl(210, 65%, 26%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '0.375rem',
+                padding: '0.5rem 1rem',
+                fontSize: '0.875rem',
+                cursor: 'pointer'
+              }}>
                 View Ratings ⭐
-              </Button>
+              </button>
             </Link>
-          </CardContent>
-        </Card>
+          </div>
 
-        <Card className="border-border bg-card hover:shadow-lg transition-shadow">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5 text-primary" />
+          <div style={{ 
+            backgroundColor: 'white', 
+            border: '1px solid hsl(214, 32%, 91%)',
+            borderRadius: '0.5rem',
+            padding: '1.5rem'
+          }}>
+            <h3 style={{ 
+              fontSize: '1.25rem', 
+              fontWeight: '600', 
+              marginBottom: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              <User size={20} style={{ color: 'hsl(210, 65%, 26%)' }} />
               My Profile
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
+            </h3>
+            <p style={{ 
+              color: 'hsl(215, 16%, 47%)', 
+              fontSize: '0.875rem',
+              marginBottom: '1rem'
+            }}>
               Manage your profile and training journal
             </p>
             <Link href="/my-profile">
-              <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+              <button style={{
+                width: '100%',
+                backgroundColor: 'hsl(210, 65%, 26%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '0.375rem',
+                padding: '0.5rem 1rem',
+                fontSize: '0.875rem',
+                cursor: 'pointer'
+              }}>
                 View Profile 👤
-              </Button>
+              </button>
             </Link>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </div>
 
-      {/* Debug info */}
-      <Card className="mt-8 border-border bg-card">
-        <CardHeader>
-          <CardTitle>Debug Info</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-sm space-y-2">
+        {/* Debug info */}
+        <div style={{ 
+          backgroundColor: 'white', 
+          border: '1px solid hsl(214, 32%, 91%)',
+          borderRadius: '0.5rem',
+          padding: '1.5rem',
+          marginTop: '2rem'
+        }}>
+          <h3 style={{ 
+            fontSize: '1.25rem', 
+            fontWeight: '600', 
+            marginBottom: '1rem' 
+          }}>
+            Debug Info
+          </h3>
+          <div style={{ fontSize: '0.875rem' }}>
             <p>User authenticated: {user ? "Yes" : "No"}</p>
             <p>User ID: {user?.id || "None"}</p>
+            <p>User name: {user?.firstName} {user?.lastName}</p>
             <p>Stats loading: {statsLoading ? "Yes" : "No"}</p>
+            <p>Stats error: {statsError ? String(statsError) : "None"}</p>
             <p>Stats data: {JSON.stringify(stats)}</p>
+            <p>Current time: {new Date().toLocaleTimeString()}</p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
