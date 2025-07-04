@@ -2,7 +2,13 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertProfileSchema, insertRatingSchema } from "@shared/schema";
+import { 
+  insertProfileSchema, 
+  insertRatingSchema,
+  insertInstructorNoteSchema,
+  insertJournalEntrySchema,
+  insertTrainingMediaSchema
+} from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -168,6 +174,131 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error sending message:", error);
       res.status(500).json({ message: "Failed to send message" });
+    }
+  });
+
+  // Instructor Notes routes
+  app.post('/api/instructor-notes', isAuthenticated, async (req: any, res) => {
+    try {
+      const instructorId = req.user.claims.sub;
+      const noteData = insertInstructorNoteSchema.parse({
+        ...req.body,
+        instructorId,
+      });
+      
+      const note = await storage.createInstructorNote(noteData);
+      res.json(note);
+    } catch (error) {
+      console.error("Error creating instructor note:", error);
+      res.status(400).json({ message: "Failed to create instructor note" });
+    }
+  });
+
+  app.get('/api/instructor-notes/:memberId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { memberId } = req.params;
+      const currentUserId = req.user.claims.sub;
+      
+      // Only allow instructors to view their own notes or members to view notes about them
+      const notes = await storage.getInstructorNotes(memberId, currentUserId);
+      res.json(notes);
+    } catch (error) {
+      console.error("Error fetching instructor notes:", error);
+      res.status(500).json({ message: "Failed to fetch instructor notes" });
+    }
+  });
+
+  // Journal Entry routes
+  app.post('/api/journal-entries', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const entryData = insertJournalEntrySchema.parse({
+        ...req.body,
+        userId,
+      });
+      
+      const entry = await storage.createJournalEntry(entryData);
+      res.json(entry);
+    } catch (error) {
+      console.error("Error creating journal entry:", error);
+      res.status(400).json({ message: "Failed to create journal entry" });
+    }
+  });
+
+  app.get('/api/journal-entries', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const entries = await storage.getJournalEntries(userId);
+      res.json(entries);
+    } catch (error) {
+      console.error("Error fetching journal entries:", error);
+      res.status(500).json({ message: "Failed to fetch journal entries" });
+    }
+  });
+
+  app.put('/api/journal-entries/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const entryId = parseInt(req.params.id);
+      const updates = insertJournalEntrySchema.partial().parse(req.body);
+      
+      const entry = await storage.updateJournalEntry(entryId, updates);
+      res.json(entry);
+    } catch (error) {
+      console.error("Error updating journal entry:", error);
+      res.status(400).json({ message: "Failed to update journal entry" });
+    }
+  });
+
+  app.delete('/api/journal-entries/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const entryId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      
+      await storage.deleteJournalEntry(entryId, userId);
+      res.json({ message: "Journal entry deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting journal entry:", error);
+      res.status(500).json({ message: "Failed to delete journal entry" });
+    }
+  });
+
+  // Training Media routes
+  app.post('/api/training-media', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const mediaData = insertTrainingMediaSchema.parse({
+        ...req.body,
+        userId,
+      });
+      
+      const media = await storage.createTrainingMedia(mediaData);
+      res.json(media);
+    } catch (error) {
+      console.error("Error creating training media:", error);
+      res.status(400).json({ message: "Failed to create training media" });
+    }
+  });
+
+  app.get('/api/training-media', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const includePublic = req.query.includePublic === 'true';
+      
+      const media = await storage.getTrainingMedia(userId, includePublic);
+      res.json(media);
+    } catch (error) {
+      console.error("Error fetching training media:", error);
+      res.status(500).json({ message: "Failed to fetch training media" });
+    }
+  });
+
+  app.get('/api/training-media/public', isAuthenticated, async (req: any, res) => {
+    try {
+      const media = await storage.getPublicTrainingMedia();
+      res.json(media);
+    } catch (error) {
+      console.error("Error fetching public training media:", error);
+      res.status(500).json({ message: "Failed to fetch public training media" });
     }
   });
 

@@ -63,6 +63,47 @@ export const ratings = pgTable("ratings", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Instructor notes table - notes from instructors about members
+export const instructorNotes = pgTable("instructor_notes", {
+  id: serial("id").primaryKey(),
+  instructorId: varchar("instructor_id").notNull().references(() => users.id),
+  memberId: varchar("member_id").notNull().references(() => users.id),
+  title: varchar("title").notNull(),
+  content: text("content").notNull(),
+  isPrivate: boolean("is_private").default(true), // Only visible to instructor and member
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Journal entries table - self-journal notes for members
+export const journalEntries = pgTable("journal_entries", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  title: varchar("title").notNull(),
+  content: text("content").notNull(),
+  mood: varchar("mood"), // e.g., "confident", "frustrated", "motivated"
+  trainingType: varchar("training_type"), // e.g., "sparring", "drilling", "technique"
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Training media table - photos and videos from sessions
+export const trainingMedia = pgTable("training_media", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  title: varchar("title"),
+  description: text("description"),
+  mediaType: varchar("media_type").notNull(), // "photo" or "video"
+  mediaUrl: varchar("media_url").notNull(),
+  thumbnailUrl: varchar("thumbnail_url"),
+  sessionDate: timestamp("session_date"),
+  trainingPartners: text("training_partners").array(), // Array of partner names
+  techniques: text("techniques").array(), // Array of techniques practiced
+  isPublic: boolean("is_public").default(false), // Whether visible to community
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ one, many }) => ({
   profile: one(profiles, {
@@ -71,6 +112,10 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   }),
   ratingsGiven: many(ratings, { relationName: "ratingsGiven" }),
   ratingsReceived: many(ratings, { relationName: "ratingsReceived" }),
+  instructorNotesGiven: many(instructorNotes, { relationName: "instructorNotesGiven" }),
+  instructorNotesReceived: many(instructorNotes, { relationName: "instructorNotesReceived" }),
+  journalEntries: many(journalEntries),
+  trainingMedia: many(trainingMedia),
 }));
 
 export const profilesRelations = relations(profiles, ({ one }) => ({
@@ -93,6 +138,33 @@ export const ratingsRelations = relations(ratings, ({ one }) => ({
   }),
 }));
 
+export const instructorNotesRelations = relations(instructorNotes, ({ one }) => ({
+  instructor: one(users, {
+    fields: [instructorNotes.instructorId],
+    references: [users.id],
+    relationName: "instructorNotesGiven",
+  }),
+  member: one(users, {
+    fields: [instructorNotes.memberId],
+    references: [users.id],
+    relationName: "instructorNotesReceived",
+  }),
+}));
+
+export const journalEntriesRelations = relations(journalEntries, ({ one }) => ({
+  user: one(users, {
+    fields: [journalEntries.userId],
+    references: [users.id],
+  }),
+}));
+
+export const trainingMediaRelations = relations(trainingMedia, ({ one }) => ({
+  user: one(users, {
+    fields: [trainingMedia.userId],
+    references: [users.id],
+  }),
+}));
+
 // Schemas
 export const insertUserSchema = createInsertSchema(users);
 export const insertProfileSchema = createInsertSchema(profiles).omit({
@@ -104,6 +176,21 @@ export const insertRatingSchema = createInsertSchema(ratings).omit({
   id: true,
   createdAt: true,
 });
+export const insertInstructorNoteSchema = createInsertSchema(instructorNotes).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export const insertJournalEntrySchema = createInsertSchema(journalEntries).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export const insertTrainingMediaSchema = createInsertSchema(trainingMedia).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
 
 // Types
 export type UpsertUser = typeof users.$inferInsert;
@@ -112,6 +199,12 @@ export type Profile = typeof profiles.$inferSelect;
 export type InsertProfile = z.infer<typeof insertProfileSchema>;
 export type Rating = typeof ratings.$inferSelect;
 export type InsertRating = z.infer<typeof insertRatingSchema>;
+export type InstructorNote = typeof instructorNotes.$inferSelect;
+export type InsertInstructorNote = z.infer<typeof insertInstructorNoteSchema>;
+export type JournalEntry = typeof journalEntries.$inferSelect;
+export type InsertJournalEntry = z.infer<typeof insertJournalEntrySchema>;
+export type TrainingMedia = typeof trainingMedia.$inferSelect;
+export type InsertTrainingMedia = z.infer<typeof insertTrainingMediaSchema>;
 
 // Combined user with profile type
 export type UserWithProfile = User & {

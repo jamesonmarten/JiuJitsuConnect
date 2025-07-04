@@ -2,6 +2,9 @@ import {
   users,
   profiles,
   ratings,
+  instructorNotes,
+  journalEntries,
+  trainingMedia,
   type User,
   type UpsertUser,
   type Profile,
@@ -9,9 +12,15 @@ import {
   type Rating,
   type InsertRating,
   type UserWithProfile,
+  type InstructorNote,
+  type InsertInstructorNote,
+  type JournalEntry,
+  type InsertJournalEntry,
+  type TrainingMedia,
+  type InsertTrainingMedia,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, or, ilike, avg, count, desc } from "drizzle-orm";
+import { eq, and, or, ilike, avg, count, desc, gt } from "drizzle-orm";
 
 export interface IStorage {
   // User operations (mandatory for Replit Auth)
@@ -40,6 +49,25 @@ export interface IStorage {
     totalReviews: number;
     activeMembers: number;
   }>;
+
+  // Instructor Notes operations
+  createInstructorNote(note: InsertInstructorNote): Promise<InstructorNote>;
+  getInstructorNotes(memberId: string, instructorId?: string): Promise<InstructorNote[]>;
+  updateInstructorNote(noteId: number, updates: Partial<InsertInstructorNote>): Promise<InstructorNote>;
+  deleteInstructorNote(noteId: number, instructorId: string): Promise<void>;
+
+  // Journal Entry operations
+  createJournalEntry(entry: InsertJournalEntry): Promise<JournalEntry>;
+  getJournalEntries(userId: string): Promise<JournalEntry[]>;
+  updateJournalEntry(entryId: number, updates: Partial<InsertJournalEntry>): Promise<JournalEntry>;
+  deleteJournalEntry(entryId: number, userId: string): Promise<void>;
+
+  // Training Media operations
+  createTrainingMedia(media: InsertTrainingMedia): Promise<TrainingMedia>;
+  getTrainingMedia(userId: string, includePublic?: boolean): Promise<TrainingMedia[]>;
+  getPublicTrainingMedia(): Promise<TrainingMedia[]>;
+  updateTrainingMedia(mediaId: number, updates: Partial<InsertTrainingMedia>): Promise<TrainingMedia>;
+  deleteTrainingMedia(mediaId: number, userId: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -101,31 +129,14 @@ export class DatabaseStorage implements IStorage {
     role?: string;
     skillLevel?: string;
   }): Promise<UserWithProfile[]> {
-    let query = db
-      .select({
-        id: users.id,
-        email: users.email,
-        firstName: users.firstName,
-        lastName: users.lastName,
-        profileImageUrl: users.profileImageUrl,
-        createdAt: users.createdAt,
-        updatedAt: users.updatedAt,
-        profile: profiles,
-        averageRating: avg(ratings.rating),
-        ratingCount: count(ratings.id),
-      })
-      .from(users)
-      .leftJoin(profiles, eq(users.id, profiles.userId))
-      .leftJoin(ratings, eq(users.id, ratings.toUserId));
-
-    const conditions = [];
+    const conditions = [eq(profiles.isActive, true)];
 
     if (filters?.search) {
       conditions.push(
         or(
           ilike(users.firstName, `%${filters.search}%`),
           ilike(users.lastName, `%${filters.search}%`)
-        )
+        )!
       );
     }
 
@@ -141,13 +152,24 @@ export class DatabaseStorage implements IStorage {
       conditions.push(eq(profiles.skillLevel, filters.skillLevel));
     }
 
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
-
-    const result = await query
+    const result = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImageUrl: users.profileImageUrl,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+        profile: profiles,
+        averageRating: avg(ratings.rating),
+        ratingCount: count(ratings.id),
+      })
+      .from(users)
+      .leftJoin(profiles, eq(users.id, profiles.userId))
+      .leftJoin(ratings, eq(users.id, ratings.toUserId))
+      .where(and(...conditions))
       .groupBy(users.id, profiles.id)
-      .having(eq(profiles.isActive, true))
       .orderBy(desc(avg(ratings.rating)));
 
     return result.map(user => ({
@@ -248,7 +270,7 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(ratings, eq(users.id, ratings.toUserId))
       .where(eq(profiles.isActive, true))
       .groupBy(users.id, profiles.id)
-      .having(count(ratings.id).gt(0))
+      .having(gt(count(ratings.id), 0))
       .orderBy(desc(avg(ratings.rating)))
       .limit(10);
 
@@ -283,6 +305,136 @@ export class DatabaseStorage implements IStorage {
       totalReviews: totalReviews.count || 0,
       activeMembers: activeMembers.count || 0,
     };
+  }
+
+  // Instructor Notes operations
+  async createInstructorNote(note: InsertInstructorNote): Promise<InstructorNote> {
+    const [newNote] = await db
+      .insert(instructorNotes)
+      .values(note)
+      .returning();
+    return newNote;
+  }
+
+  async getInstructorNotes(memberId: string, instructorId?: string): Promise<InstructorNote[]> {
+    const conditions = [eq(instructorNotes.memberId, memberId)];
+    
+    if (instructorId) {
+      conditions.push(eq(instructorNotes.instructorId, instructorId));
+    }
+
+    return await db
+      .select()
+      .from(instructorNotes)
+      .where(and(...conditions))
+      .orderBy(desc(instructorNotes.createdAt));
+  }
+
+  async updateInstructorNote(noteId: number, updates: Partial<InsertInstructorNote>): Promise<InstructorNote> {
+    const [updatedNote] = await db
+      .update(instructorNotes)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(instructorNotes.id, noteId))
+      .returning();
+    return updatedNote;
+  }
+
+  async deleteInstructorNote(noteId: number, instructorId: string): Promise<void> {
+    await db
+      .delete(instructorNotes)
+      .where(and(
+        eq(instructorNotes.id, noteId),
+        eq(instructorNotes.instructorId, instructorId)
+      ));
+  }
+
+  // Journal Entry operations
+  async createJournalEntry(entry: InsertJournalEntry): Promise<JournalEntry> {
+    const [newEntry] = await db
+      .insert(journalEntries)
+      .values(entry)
+      .returning();
+    return newEntry;
+  }
+
+  async getJournalEntries(userId: string): Promise<JournalEntry[]> {
+    return await db
+      .select()
+      .from(journalEntries)
+      .where(eq(journalEntries.userId, userId))
+      .orderBy(desc(journalEntries.createdAt));
+  }
+
+  async updateJournalEntry(entryId: number, updates: Partial<InsertJournalEntry>): Promise<JournalEntry> {
+    const [updatedEntry] = await db
+      .update(journalEntries)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(journalEntries.id, entryId))
+      .returning();
+    return updatedEntry;
+  }
+
+  async deleteJournalEntry(entryId: number, userId: string): Promise<void> {
+    await db
+      .delete(journalEntries)
+      .where(and(
+        eq(journalEntries.id, entryId),
+        eq(journalEntries.userId, userId)
+      ));
+  }
+
+  // Training Media operations
+  async createTrainingMedia(media: InsertTrainingMedia): Promise<TrainingMedia> {
+    const [newMedia] = await db
+      .insert(trainingMedia)
+      .values(media)
+      .returning();
+    return newMedia;
+  }
+
+  async getTrainingMedia(userId: string, includePublic: boolean = false): Promise<TrainingMedia[]> {
+    if (includePublic) {
+      return await db
+        .select()
+        .from(trainingMedia)
+        .where(or(
+          eq(trainingMedia.userId, userId),
+          eq(trainingMedia.isPublic, true)
+        ))
+        .orderBy(desc(trainingMedia.createdAt));
+    }
+
+    return await db
+      .select()
+      .from(trainingMedia)
+      .where(eq(trainingMedia.userId, userId))
+      .orderBy(desc(trainingMedia.createdAt));
+  }
+
+  async getPublicTrainingMedia(): Promise<TrainingMedia[]> {
+    return await db
+      .select()
+      .from(trainingMedia)
+      .where(eq(trainingMedia.isPublic, true))
+      .orderBy(desc(trainingMedia.createdAt));
+  }
+
+  async updateTrainingMedia(mediaId: number, updates: Partial<InsertTrainingMedia>): Promise<TrainingMedia> {
+    const [updatedMedia] = await db
+      .update(trainingMedia)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(trainingMedia.id, mediaId))
+      .returning();
+    return updatedMedia;
+  }
+
+  async deleteTrainingMedia(mediaId: number, userId: string): Promise<void> {
+    await db
+      .delete(trainingMedia)
+      .where(and(
+        eq(trainingMedia.id, mediaId),
+        eq(trainingMedia.userId, userId)
+      ));
   }
 }
 

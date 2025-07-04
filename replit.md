@@ -29,6 +29,9 @@ Grapplr is a full-stack web application built to connect the Jiu-Jitsu community
 - **Users Table**: Core user information (id, email, names, profile image)
 - **Profiles Table**: Extended user information (role, skill level, gym affiliation, location, belt rank)
 - **Ratings Table**: User-to-user ratings and reviews system
+- **Instructor Notes Table**: Notes from instructors about members' progress
+- **Journal Entries Table**: Self-journal notes for members to track their training
+- **Training Media Table**: Photos and videos from sparring sessions with metadata
 
 ### Authentication System
 - **Provider**: Replit Auth with passport.js integration
@@ -48,6 +51,7 @@ Grapplr is a full-stack web application built to connect the Jiu-Jitsu community
 - **Explore**: User discovery with advanced filtering
 - **Profile Detail**: Individual user profiles with rating/contact options
 - **Profile Edit**: Form for updating user information
+- **My Profile**: Enhanced personal profile area with training journal, media gallery, and instructor notes
 - **Ratings**: Community rating statistics and leaderboards
 
 ## Data Flow
@@ -56,7 +60,11 @@ Grapplr is a full-stack web application built to connect the Jiu-Jitsu community
 2. **Profile Setup**: New users complete their martial arts profile information
 3. **Discovery**: Users search and filter community members by location, skill level, role
 4. **Interaction**: Users can view profiles, contact members, and submit ratings
-5. **Analytics**: System aggregates ratings for community statistics and rankings
+5. **Enhanced Profile Features**: 
+   - Members maintain private training journals with mood tracking and session notes
+   - Upload photos/videos from sparring sessions with technique tagging
+   - Instructors can add private notes about member progress
+6. **Analytics**: System aggregates ratings for community statistics and rankings
 
 ## External Dependencies
 

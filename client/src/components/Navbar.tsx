@@ -12,6 +12,7 @@ export default function Navbar() {
 
   const navItems = [
     { href: "/explore", label: "Explore" },
+    { href: "/my-profile", label: "My Profile" },
     { href: "/ratings", label: "Ratings" },
   ];
 

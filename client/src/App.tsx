@@ -10,6 +10,7 @@ import Home from "@/pages/Home";
 import Explore from "@/pages/Explore";
 import ProfileDetail from "@/pages/ProfileDetail";
 import ProfileEdit from "@/pages/ProfileEdit";
+import MyProfile from "@/pages/MyProfile";
 import Ratings from "@/pages/Ratings";
 import Navbar from "@/components/Navbar";
 
@@ -35,6 +36,7 @@ function Router() {
           <Route path="/explore" component={Explore} />
           <Route path="/profile/:id" component={ProfileDetail} />
           <Route path="/profile-edit" component={ProfileEdit} />
+          <Route path="/my-profile" component={MyProfile} />
           <Route path="/ratings" component={Ratings} />
         </>
       )}
