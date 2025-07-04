@@ -38,7 +38,7 @@ function Router() {
         ) : (
           <>
             <Navbar />
-            <main className="pt-4">
+            <main style={{ paddingTop: '1rem', minHeight: '100vh', backgroundColor: 'hsl(210, 20%, 98%)' }}>
               <Route path="/" component={Home} />
               <Route path="/explore" component={Explore} />
               <Route path="/profile/:id" component={ProfileDetail} />

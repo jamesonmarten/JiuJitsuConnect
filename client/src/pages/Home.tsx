@@ -9,6 +9,7 @@ export default function Home() {
   const { user } = useAuth();
   
   console.log("Home component rendering with user:", user);
+  console.log("Home component DOM render at:", new Date().toLocaleTimeString());
 
   const { data: stats, isLoading: statsLoading, error: statsError } = useQuery<{
     averageRating: number;
@@ -24,10 +25,15 @@ export default function Home() {
   return (
     <div style={{ 
       minHeight: '100vh', 
-      backgroundColor: 'hsl(210, 20%, 98%)', 
-      color: 'hsl(210, 24%, 16%)',
-      padding: '2rem'
+      backgroundColor: 'red', 
+      color: 'white',
+      padding: '2rem',
+      fontSize: '24px',
+      fontWeight: 'bold'
     }}>
+      <div style={{ backgroundColor: 'blue', padding: '20px', margin: '20px' }}>
+        HOME PAGE IS RENDERING - {new Date().toLocaleTimeString()}
+      </div>
       <div className="container mx-auto">
         {/* Welcome Section - Always visible */}
         <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
