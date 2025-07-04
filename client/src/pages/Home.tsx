@@ -25,15 +25,10 @@ export default function Home() {
   return (
     <div style={{ 
       minHeight: '100vh', 
-      backgroundColor: 'red', 
-      color: 'white',
-      padding: '2rem',
-      fontSize: '24px',
-      fontWeight: 'bold'
+      backgroundColor: 'hsl(210, 20%, 98%)', 
+      color: 'hsl(210, 24%, 16%)',
+      padding: '2rem'
     }}>
-      <div style={{ backgroundColor: 'blue', padding: '20px', margin: '20px' }}>
-        HOME PAGE IS RENDERING - {new Date().toLocaleTimeString()}
-      </div>
       <div className="container mx-auto">
         {/* Welcome Section - Always visible */}
         <div style={{ marginBottom: '2rem', textAlign: 'center' }}>

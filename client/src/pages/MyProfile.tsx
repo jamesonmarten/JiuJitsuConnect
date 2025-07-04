@@ -12,15 +12,10 @@ export default function MyProfile() {
   return (
     <div style={{ 
       minHeight: '100vh', 
-      backgroundColor: 'purple', 
-      color: 'white',
-      padding: '2rem',
-      fontSize: '24px',
-      fontWeight: 'bold'
+      backgroundColor: 'hsl(210, 20%, 98%)', 
+      color: 'hsl(210, 24%, 16%)',
+      padding: '2rem'
     }}>
-      <div style={{ backgroundColor: 'orange', color: 'black', padding: '20px', margin: '20px' }}>
-        MY PROFILE PAGE IS RENDERING - {new Date().toLocaleTimeString()}
-      </div>
       <div className="container mx-auto">
         {/* Header */}
         <div style={{ marginBottom: '2rem' }}>
