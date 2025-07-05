@@ -19,9 +19,8 @@ export default function Landing() {
               <div className="flex gap-4">
                 <Button 
                   size="lg" 
-                  variant="secondary"
                   onClick={() => window.location.href = '/api/login'}
-                  className="bg-white text-black hover:bg-gray-100"
+                  className="bg-blue-600 text-white hover:bg-blue-700 border-none shadow-lg"
                 >
                   <Users className="mr-2 h-5 w-5" />
                   Get Started
@@ -30,7 +29,7 @@ export default function Landing() {
                   size="lg" 
                   variant="outline" 
                   onClick={() => window.location.href = '/api/login'}
-                  className="border-white text-white hover:bg-white hover:text-primary"
+                  className="border-2 border-white text-white hover:bg-white hover:text-blue-600 bg-transparent"
                 >
                   Sign In
                 </Button>

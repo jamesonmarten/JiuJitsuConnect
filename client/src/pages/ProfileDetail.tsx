@@ -4,18 +4,25 @@ import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Mail, Star, Calendar } from "lucide-react";
+import { MapPin, Mail, Star, Calendar, UserPlus, UserMinus, MessageSquare } from "lucide-react";
 import StarRating from "@/components/StarRating";
 import ContactModal from "@/components/ContactModal";
 import RatingModal from "@/components/RatingModal";
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import { UserWithProfile } from "@shared/schema";
 
 export default function ProfileDetail() {
   const { id } = useParams<{ id: string }>();
   const { user: currentUser } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [showContactModal, setShowContactModal] = useState(false);
   const [showRatingModal, setShowRatingModal] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false); // In real app, fetch from API
+  const [mutualFollow, setMutualFollow] = useState(false); // If both users follow each other
 
   const { data: user, isLoading } = useQuery({
     queryKey: ["/api/users", id],
@@ -40,6 +47,59 @@ export default function ProfileDetail() {
     },
     enabled: !!id,
   });
+
+  // Follow/Unfollow mutations for business networking
+  const followMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest("POST", `/api/follow/${id}`);
+    },
+    onSuccess: () => {
+      setIsFollowing(true);
+      toast({
+        title: "Success",
+        description: `You are now following ${user?.firstName} ${user?.lastName}`,
+      });
+      // In real app, you'd check for mutual follow status here
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to follow user",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const unfollowMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest("DELETE", `/api/follow/${id}`);
+    },
+    onSuccess: () => {
+      setIsFollowing(false);
+      setMutualFollow(false);
+      toast({
+        title: "Success",
+        description: `You unfollowed ${user?.firstName} ${user?.lastName}`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to unfollow user",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Easter egg: Quick networking actions
+  const handleEasterEggNetworking = () => {
+    toast({
+      title: "🚀 Power User Mode Activated!",
+      description: "You've discovered the quick networking shortcut. Nice work!",
+    });
+    setIsFollowing(true);
+    setMutualFollow(true);
+  };
 
   if (isLoading) {
     return (
@@ -106,6 +166,7 @@ export default function ProfileDetail() {
 
               {!isOwnProfile && (
                 <div className="space-y-2">
+                  {/* Primary Contact Button */}
                   <Button 
                     className="w-full" 
                     onClick={() => setShowContactModal(true)}
@@ -113,6 +174,39 @@ export default function ProfileDetail() {
                     <Mail className="mr-2 h-4 w-4" />
                     Contact
                   </Button>
+                  
+                  {/* Follow/Unfollow Button for Business Networking */}
+                  <Button 
+                    variant={isFollowing ? "outline" : "default"}
+                    className="w-full"
+                    onClick={() => isFollowing ? unfollowMutation.mutate() : followMutation.mutate()}
+                    disabled={followMutation.isPending || unfollowMutation.isPending}
+                  >
+                    {isFollowing ? (
+                      <>
+                        <UserMinus className="mr-2 h-4 w-4" />
+                        {unfollowMutation.isPending ? "Unfollowing..." : "Unfollow"}
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        {followMutation.isPending ? "Following..." : "Follow"}
+                      </>
+                    )}
+                  </Button>
+
+                  {/* Direct Message - Only if mutual follow */}
+                  {mutualFollow && (
+                    <Button 
+                      variant="outline" 
+                      className="w-full bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                    >
+                      <MessageSquare className="mr-2 h-4 w-4" />
+                      Direct Message
+                    </Button>
+                  )}
+
+                  {/* Rate Button */}
                   <Button 
                     variant="outline" 
                     className="w-full"
@@ -121,6 +215,19 @@ export default function ProfileDetail() {
                     <Star className="mr-2 h-4 w-4" />
                     Rate This Member
                   </Button>
+
+                  {/* Easter Egg Button */}
+                  <div className="pt-2">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      className="w-full text-xs text-muted-foreground hover:text-primary"
+                      onClick={handleEasterEggNetworking}
+                      onDoubleClick={handleEasterEggNetworking}
+                    >
+                      🥋 Quick Connect
+                    </Button>
+                  </div>
                 </div>
               )}
             </CardContent>

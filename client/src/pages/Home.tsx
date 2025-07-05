@@ -152,7 +152,7 @@ export default function Home() {
         </Card>
       </div>
 
-      {/* Recent Activity Placeholder */}
+      {/* Recent Activity */}
       <Card>
         <CardHeader>
           <CardTitle>Recent Activity</CardTitle>
@@ -169,12 +169,29 @@ export default function Home() {
                   Explore Community
                 </Button>
               </Link>
+              <Link href="/gym-finder">
+                <Button variant="outline">
+                  <Trophy className="h-4 w-4 mr-2" />
+                  Find Gyms
+                </Button>
+              </Link>
               <Link href="/profile-edit">
                 <Button variant="outline">
                   <User className="h-4 w-4 mr-2" />
                   Complete Profile
                 </Button>
               </Link>
+            </div>
+            
+            {/* Easter Egg */}
+            <div className="mt-6 text-xs text-muted-foreground">
+              <p className="cursor-pointer hover:text-primary transition-colors" 
+                 onClick={() => {
+                   console.log("🥋 You found the secret dojo! The path of the warrior is patience...");
+                   alert("🥋 Secret dojo discovered! +10 XP to your martial arts journey!");
+                 }}>
+                💡 Tip: Click here for a surprise
+              </p>
             </div>
           </div>
         </CardContent>

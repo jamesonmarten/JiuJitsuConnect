@@ -302,6 +302,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Contact/Messaging routes
+  app.post('/api/contact', isAuthenticated, async (req: any, res) => {
+    try {
+      const fromUserId = req.user.claims.sub;
+      const { name, email, subject, message, toUserId } = req.body;
+      
+      // Basic validation
+      if (!subject || !message || !toUserId) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      // For now, we'll just log the message (in a real app, you'd save to database or send email)
+      console.log(`Contact message from ${fromUserId} to ${toUserId}:`, {
+        name,
+        email,
+        subject,
+        message
+      });
+
+      // Simulate successful message sending
+      res.json({ 
+        success: true, 
+        message: "Message sent successfully" 
+      });
+    } catch (error) {
+      console.error("Error sending contact message:", error);
+      res.status(500).json({ message: "Failed to send message" });
+    }
+  });
+
+  // Following routes for business networking
+  app.post('/api/follow/:userId', isAuthenticated, async (req: any, res) => {
+    try {
+      const followerId = req.user.claims.sub;
+      const followingId = req.params.userId;
+      
+      if (followerId === followingId) {
+        return res.status(400).json({ message: "Cannot follow yourself" });
+      }
+
+      // For now, just return success (would implement database logic here)
+      res.json({ success: true, message: "Now following user" });
+    } catch (error) {
+      console.error("Error following user:", error);
+      res.status(500).json({ message: "Failed to follow user" });
+    }
+  });
+
+  app.delete('/api/follow/:userId', isAuthenticated, async (req: any, res) => {
+    try {
+      const followerId = req.user.claims.sub;
+      const followingId = req.params.userId;
+      
+      // For now, just return success (would implement database logic here)
+      res.json({ success: true, message: "Unfollowed user" });
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+      res.status(500).json({ message: "Failed to unfollow user" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

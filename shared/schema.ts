@@ -9,6 +9,7 @@ import {
   integer,
   decimal,
   boolean,
+  unique,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
@@ -107,6 +108,27 @@ export const trainingMedia = pgTable("training_media", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Messages table for direct communication
+export const messages = pgTable("messages", {
+  id: serial("id").primaryKey(),
+  fromUserId: varchar("from_user_id").notNull().references(() => users.id),
+  toUserId: varchar("to_user_id").notNull().references(() => users.id),
+  subject: varchar("subject").notNull(),
+  content: text("content").notNull(),
+  isRead: boolean("is_read").default(false),
+  messageType: varchar("message_type").default("contact"), // 'contact', 'direct_message'
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Following system for mutual connections (business networking)
+export const follows = pgTable("follows", {
+  id: serial("id").primaryKey(),
+  followerId: varchar("follower_id").notNull().references(() => users.id),
+  followingId: varchar("following_id").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ one, many }) => ({
   profile: one(profiles, {
@@ -119,6 +141,10 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   instructorNotesReceived: many(instructorNotes, { relationName: "instructorNotesReceived" }),
   journalEntries: many(journalEntries),
   trainingMedia: many(trainingMedia),
+  messagesSent: many(messages, { relationName: "messagesSent" }),
+  messagesReceived: many(messages, { relationName: "messagesReceived" }),
+  following: many(follows, { relationName: "following" }),
+  followers: many(follows, { relationName: "followers" }),
 }));
 
 export const profilesRelations = relations(profiles, ({ one }) => ({
@@ -168,6 +194,32 @@ export const trainingMediaRelations = relations(trainingMedia, ({ one }) => ({
   }),
 }));
 
+export const messagesRelations = relations(messages, ({ one }) => ({
+  fromUser: one(users, {
+    fields: [messages.fromUserId],
+    references: [users.id],
+    relationName: "messagesSent",
+  }),
+  toUser: one(users, {
+    fields: [messages.toUserId],
+    references: [users.id],
+    relationName: "messagesReceived",
+  }),
+}));
+
+export const followsRelations = relations(follows, ({ one }) => ({
+  follower: one(users, {
+    fields: [follows.followerId],
+    references: [users.id],
+    relationName: "following",
+  }),
+  following: one(users, {
+    fields: [follows.followingId],
+    references: [users.id],
+    relationName: "followers",
+  }),
+}));
+
 // Schemas
 export const insertUserSchema = createInsertSchema(users);
 export const insertProfileSchema = createInsertSchema(profiles).omit({
@@ -195,6 +247,17 @@ export const insertTrainingMediaSchema = createInsertSchema(trainingMedia).omit(
   updatedAt: true,
 });
 
+export const insertMessageSchema = createInsertSchema(messages).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertFollowSchema = createInsertSchema(follows).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -208,6 +271,10 @@ export type JournalEntry = typeof journalEntries.$inferSelect;
 export type InsertJournalEntry = z.infer<typeof insertJournalEntrySchema>;
 export type TrainingMedia = typeof trainingMedia.$inferSelect;
 export type InsertTrainingMedia = z.infer<typeof insertTrainingMediaSchema>;
+export type Message = typeof messages.$inferSelect;
+export type InsertMessage = z.infer<typeof insertMessageSchema>;
+export type Follow = typeof follows.$inferSelect;
+export type InsertFollow = z.infer<typeof insertFollowSchema>;
 
 // Combined user with profile type
 export type UserWithProfile = User & {
