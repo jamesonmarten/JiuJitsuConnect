@@ -12,6 +12,7 @@ import ProfileDetail from "@/pages/ProfileDetail";
 import ProfileEdit from "@/pages/ProfileEdit";
 import MyProfile from "@/pages/MyProfile";
 import Ratings from "@/pages/Ratings";
+import InstructorNotes from "@/pages/InstructorNotes";
 import Navbar from "@/components/Navbar";
 
 function Router() {
@@ -50,6 +51,7 @@ function Router() {
           <Route path="/profile-edit" component={ProfileEdit} />
           <Route path="/my-profile" component={MyProfile} />
           <Route path="/ratings" component={Ratings} />
+          <Route path="/instructor-notes" component={InstructorNotes} />
           <Route component={NotFound} />
         </Switch>
       </main>
