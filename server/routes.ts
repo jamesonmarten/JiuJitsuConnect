@@ -84,7 +84,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         skillLevel: req.query.skillLevel as string,
       };
       
-      const users = await storage.getUsersWithProfiles(filters);
+      // Clean up filters - remove empty strings and undefined values
+      const cleanFilters = Object.fromEntries(
+        Object.entries(filters).filter(([_, value]) => value && value !== 'all')
+      );
+      
+      console.log('Applied filters:', cleanFilters);
+      
+      const users = await storage.getUsersWithProfiles(cleanFilters);
       res.json(users);
     } catch (error) {
       console.error("Error fetching users:", error);

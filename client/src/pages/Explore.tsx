@@ -19,6 +19,31 @@ export default function Explore() {
 
   const { data: users = [], isLoading } = useQuery<UserWithProfile[]>({
     queryKey: ["/api/users", filters],
+    queryFn: async () => {
+      const searchParams = new URLSearchParams();
+      
+      // Only add non-empty and non-'all' filter values
+      if (filters.search && filters.search.trim()) {
+        searchParams.append('search', filters.search);
+      }
+      if (filters.location && filters.location !== 'all') {
+        searchParams.append('location', filters.location);
+      }
+      if (filters.role && filters.role !== 'all') {
+        searchParams.append('role', filters.role);
+      }
+      if (filters.skillLevel && filters.skillLevel !== 'all') {
+        searchParams.append('skillLevel', filters.skillLevel);
+      }
+      
+      const url = `/api/users${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+      const response = await fetch(url, {
+        credentials: "include",
+      });
+      
+      if (!response.ok) throw new Error("Failed to fetch users");
+      return response.json();
+    },
   });
 
   const handleFilterChange = (key: string, value: string) => {
@@ -167,10 +192,24 @@ export default function Explore() {
               )}
               
               <div className="flex gap-2 mt-4">
-                <Button size="sm" className="flex-1">
+                <Button 
+                  size="sm" 
+                  className="flex-1"
+                  onClick={() => window.location.href = `/profile/${user.id}`}
+                >
                   View Profile
                 </Button>
-                <Button size="sm" variant="outline">
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => {
+                    if (user.profile?.phone) {
+                      window.open(`tel:${user.profile.phone}`, '_self');
+                    } else {
+                      window.open(`mailto:${user.email}`, '_self');
+                    }
+                  }}
+                >
                   Contact
                 </Button>
               </div>
