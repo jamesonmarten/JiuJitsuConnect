@@ -184,7 +184,7 @@ export default function Home() {
             </div>
             
             {/* Easter Egg */}
-            <div className="mt-6 text-xs text-muted-foreground">
+            <div className="mt-6 text-xs text-muted-foreground space-y-2">
               <p className="cursor-pointer hover:text-primary transition-colors" 
                  onClick={() => {
                    console.log("🥋 You found the secret dojo! The path of the warrior is patience...");
@@ -192,6 +192,35 @@ export default function Home() {
                  }}>
                 💡 Tip: Click here for a surprise
               </p>
+              
+              {/* Temporary seeding button */}
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="text-xs"
+                onClick={async () => {
+                  try {
+                    const response = await fetch('/api/seed-members', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      credentials: 'include',
+                    });
+                    
+                    if (response.ok) {
+                      alert('🥋 Famous MMA fighters added to the community!');
+                      window.location.reload();
+                    } else {
+                      console.error('Failed to seed members');
+                    }
+                  } catch (error) {
+                    console.error('Error seeding members:', error);
+                  }
+                }}
+              >
+                🥋 Add Famous Fighters
+              </Button>
             </div>
           </div>
         </CardContent>

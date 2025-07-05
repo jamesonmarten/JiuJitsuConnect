@@ -10,6 +10,7 @@ import {
   insertTrainingMediaSchema
 } from "@shared/schema";
 import { z } from "zod";
+import { seedMMAMembers } from "./seedMembers";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -360,6 +361,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error unfollowing user:", error);
       res.status(500).json({ message: "Failed to unfollow user" });
+    }
+  });
+
+  // Seed MMA members endpoint (for development)
+  app.post('/api/seed-members', async (req, res) => {
+    try {
+      await seedMMAMembers();
+      res.json({ success: true, message: "MMA members seeded successfully" });
+    } catch (error) {
+      console.error("Error seeding members:", error);
+      res.status(500).json({ message: "Failed to seed members" });
     }
   });
 
