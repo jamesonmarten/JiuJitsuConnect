@@ -13,6 +13,7 @@ export default function Navbar() {
   const navItems = [
     { href: "/explore", label: "Explore" },
     { href: "/recommendations", label: "AI Match" },
+    { href: "/training-sessions", label: "Sessions" },
     { href: "/gym-finder", label: "Find Gyms" },
     { href: "/my-profile", label: "My Profile" },
     { href: "/ratings", label: "Ratings" },

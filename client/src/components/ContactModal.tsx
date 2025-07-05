@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Mail, Calendar } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import TrainingSessionModal from "./TrainingSessionModal";
 
 interface ContactModalProps {
   isOpen: boolean;
@@ -24,6 +26,7 @@ export default function ContactModal({
 }: ContactModalProps) {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [showTrainingModal, setShowTrainingModal] = useState(false);
   const [formData, setFormData] = useState({
     name: `${user?.firstName} ${user?.lastName}`,
     email: user?.email || "",
@@ -115,16 +118,36 @@ export default function ContactModal({
               required
             />
           </div>
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
+          <div className="flex justify-between gap-2">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setShowTrainingModal(true)}
+              className="flex items-center gap-2"
+            >
+              <Calendar className="h-4 w-4" />
+              Schedule Session
             </Button>
-            <Button type="submit" disabled={sendMessageMutation.isPending}>
-              {sendMessageMutation.isPending ? "Sending..." : "Send Message"}
-            </Button>
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={sendMessageMutation.isPending}>
+                <Mail className="h-4 w-4 mr-2" />
+                {sendMessageMutation.isPending ? "Sending..." : "Send Message"}
+              </Button>
+            </div>
           </div>
         </form>
       </DialogContent>
+      
+      {/* Training Session Modal */}
+      <TrainingSessionModal
+        isOpen={showTrainingModal}
+        onClose={() => setShowTrainingModal(false)}
+        partnerId={recipientId}
+        partnerName={recipientName}
+      />
     </Dialog>
   );
 }

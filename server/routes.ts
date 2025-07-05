@@ -429,6 +429,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Message routes
+  app.post('/api/messages', isAuthenticated, async (req: any, res) => {
+    try {
+      const fromUserId = req.user.claims.sub;
+      const messageData = {
+        ...req.body,
+        fromUserId,
+      };
+      
+      const message = await storage.createMessage(messageData);
+      res.json(message);
+    } catch (error) {
+      console.error("Error creating message:", error);
+      res.status(400).json({ message: "Failed to send message" });
+    }
+  });
+
+  app.get('/api/messages', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const otherUserId = req.query.with as string;
+      
+      const messages = await storage.getMessages(userId, otherUserId);
+      res.json(messages);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      res.status(500).json({ message: "Failed to fetch messages" });
+    }
+  });
+
+  app.get('/api/conversations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const conversations = await storage.getConversations(userId);
+      res.json(conversations);
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+      res.status(500).json({ message: "Failed to fetch conversations" });
+    }
+  });
+
+  // Training Session routes
+  app.post('/api/training-sessions', isAuthenticated, async (req: any, res) => {
+    try {
+      const organizerId = req.user.claims.sub;
+      const sessionData = {
+        ...req.body,
+        organizerId,
+        sessionDate: new Date(req.body.sessionDate),
+      };
+      
+      const session = await storage.createTrainingSession(sessionData);
+      res.json(session);
+    } catch (error) {
+      console.error("Error creating training session:", error);
+      res.status(400).json({ message: "Failed to create training session" });
+    }
+  });
+
+  app.get('/api/training-sessions', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const sessions = await storage.getTrainingSessions(userId);
+      res.json(sessions);
+    } catch (error) {
+      console.error("Error fetching training sessions:", error);
+      res.status(500).json({ message: "Failed to fetch training sessions" });
+    }
+  });
+
+  app.patch('/api/training-sessions/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const sessionId = parseInt(req.params.id);
+      const updates = req.body;
+      
+      if (updates.sessionDate) {
+        updates.sessionDate = new Date(updates.sessionDate);
+      }
+      
+      const session = await storage.updateTrainingSession(sessionId, updates);
+      res.json(session);
+    } catch (error) {
+      console.error("Error updating training session:", error);
+      res.status(400).json({ message: "Failed to update training session" });
+    }
+  });
+
   // Seed MMA members endpoint (for development)
   app.post('/api/seed-members', async (req, res) => {
     try {

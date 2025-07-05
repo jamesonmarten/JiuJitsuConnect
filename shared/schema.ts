@@ -121,6 +121,22 @@ export const messages = pgTable("messages", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Training sessions for coordinating meetups
+export const trainingSessions = pgTable("training_sessions", {
+  id: serial("id").primaryKey(),
+  organizerId: varchar("organizer_id").notNull().references(() => users.id),
+  partnerId: varchar("partner_id").notNull().references(() => users.id),
+  gymName: varchar("gym_name").notNull(),
+  gymAddress: varchar("gym_address").notNull(),
+  sessionDate: timestamp("session_date").notNull(),
+  duration: integer("duration").notNull(), // in minutes
+  trainingType: varchar("training_type").notNull(), // 'sparring', 'drilling', 'rolling', 'technique'
+  notes: text("notes"),
+  status: varchar("status").default("pending"), // 'pending', 'confirmed', 'cancelled', 'completed'
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Following system for mutual connections (business networking)
 export const follows = pgTable("follows", {
   id: serial("id").primaryKey(),
@@ -143,6 +159,8 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   trainingMedia: many(trainingMedia),
   messagesSent: many(messages, { relationName: "messagesSent" }),
   messagesReceived: many(messages, { relationName: "messagesReceived" }),
+  trainingSessionsOrganized: many(trainingSessions, { relationName: "trainingSessionsOrganized" }),
+  trainingSessionsParticipated: many(trainingSessions, { relationName: "trainingSessionsParticipated" }),
   following: many(follows, { relationName: "following" }),
   followers: many(follows, { relationName: "followers" }),
 }));
@@ -207,6 +225,19 @@ export const messagesRelations = relations(messages, ({ one }) => ({
   }),
 }));
 
+export const trainingSessionsRelations = relations(trainingSessions, ({ one }) => ({
+  organizer: one(users, {
+    fields: [trainingSessions.organizerId],
+    references: [users.id],
+    relationName: "trainingSessionsOrganized",
+  }),
+  partner: one(users, {
+    fields: [trainingSessions.partnerId],
+    references: [users.id],
+    relationName: "trainingSessionsParticipated",
+  }),
+}));
+
 export const followsRelations = relations(follows, ({ one }) => ({
   follower: one(users, {
     fields: [follows.followerId],
@@ -253,6 +284,12 @@ export const insertMessageSchema = createInsertSchema(messages).omit({
   updatedAt: true,
 });
 
+export const insertTrainingSessionSchema = createInsertSchema(trainingSessions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertFollowSchema = createInsertSchema(follows).omit({
   id: true,
   createdAt: true,
@@ -273,6 +310,8 @@ export type TrainingMedia = typeof trainingMedia.$inferSelect;
 export type InsertTrainingMedia = z.infer<typeof insertTrainingMediaSchema>;
 export type Message = typeof messages.$inferSelect;
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
+export type TrainingSession = typeof trainingSessions.$inferSelect;
+export type InsertTrainingSession = z.infer<typeof insertTrainingSessionSchema>;
 export type Follow = typeof follows.$inferSelect;
 export type InsertFollow = z.infer<typeof insertFollowSchema>;
 

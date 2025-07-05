@@ -5,6 +5,8 @@ import {
   instructorNotes,
   journalEntries,
   trainingMedia,
+  messages,
+  trainingSessions,
   type User,
   type UpsertUser,
   type Profile,
@@ -18,6 +20,10 @@ import {
   type InsertJournalEntry,
   type TrainingMedia,
   type InsertTrainingMedia,
+  type Message,
+  type InsertMessage,
+  type TrainingSession,
+  type InsertTrainingSession,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, or, ilike, avg, count, desc, gt } from "drizzle-orm";
@@ -68,6 +74,18 @@ export interface IStorage {
   getPublicTrainingMedia(): Promise<TrainingMedia[]>;
   updateTrainingMedia(mediaId: number, updates: Partial<InsertTrainingMedia>): Promise<TrainingMedia>;
   deleteTrainingMedia(mediaId: number, userId: string): Promise<void>;
+
+  // Message operations
+  createMessage(message: InsertMessage): Promise<Message>;
+  getMessages(userId: string, otherUserId?: string): Promise<Message[]>;
+  getConversations(userId: string): Promise<{ user: UserWithProfile; lastMessage: Message; unreadCount: number }[]>;
+  markMessageAsRead(messageId: number, userId: string): Promise<void>;
+
+  // Training Session operations
+  createTrainingSession(session: InsertTrainingSession): Promise<TrainingSession>;
+  getTrainingSessions(userId: string): Promise<TrainingSession[]>;
+  updateTrainingSession(sessionId: number, updates: Partial<InsertTrainingSession>): Promise<TrainingSession>;
+  deleteTrainingSession(sessionId: number, userId: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -434,6 +452,117 @@ export class DatabaseStorage implements IStorage {
       .where(and(
         eq(trainingMedia.id, mediaId),
         eq(trainingMedia.userId, userId)
+      ));
+  }
+
+  // Message operations
+  async createMessage(message: InsertMessage): Promise<Message> {
+    const [newMessage] = await db
+      .insert(messages)
+      .values(message)
+      .returning();
+    return newMessage;
+  }
+
+  async getMessages(userId: string, otherUserId?: string): Promise<Message[]> {
+    if (otherUserId) {
+      // Get conversation between two specific users
+      return await db
+        .select()
+        .from(messages)
+        .where(or(
+          and(eq(messages.fromUserId, userId), eq(messages.toUserId, otherUserId)),
+          and(eq(messages.fromUserId, otherUserId), eq(messages.toUserId, userId))
+        ))
+        .orderBy(desc(messages.createdAt));
+    }
+    
+    // Get all messages for user
+    return await db
+      .select()
+      .from(messages)
+      .where(or(
+        eq(messages.fromUserId, userId),
+        eq(messages.toUserId, userId)
+      ))
+      .orderBy(desc(messages.createdAt));
+  }
+
+  async getConversations(userId: string): Promise<{ user: UserWithProfile; lastMessage: Message; unreadCount: number }[]> {
+    // This is a simplified implementation
+    const userMessages = await this.getMessages(userId);
+    const conversations: { [key: string]: { user: UserWithProfile; lastMessage: Message; unreadCount: number } } = {};
+    
+    for (const message of userMessages) {
+      const otherUserId = message.fromUserId === userId ? message.toUserId : message.fromUserId;
+      
+      if (!conversations[otherUserId]) {
+        const user = await this.getUserWithProfile(otherUserId);
+        if (user) {
+          conversations[otherUserId] = {
+            user,
+            lastMessage: message,
+            unreadCount: 0
+          };
+        }
+      }
+      
+      if (message.toUserId === userId && !message.isRead) {
+        conversations[otherUserId].unreadCount++;
+      }
+    }
+    
+    return Object.values(conversations);
+  }
+
+  async markMessageAsRead(messageId: number, userId: string): Promise<void> {
+    await db
+      .update(messages)
+      .set({ isRead: true })
+      .where(and(
+        eq(messages.id, messageId),
+        eq(messages.toUserId, userId)
+      ));
+  }
+
+  // Training Session operations
+  async createTrainingSession(session: InsertTrainingSession): Promise<TrainingSession> {
+    const [newSession] = await db
+      .insert(trainingSessions)
+      .values(session)
+      .returning();
+    return newSession;
+  }
+
+  async getTrainingSessions(userId: string): Promise<TrainingSession[]> {
+    return await db
+      .select()
+      .from(trainingSessions)
+      .where(or(
+        eq(trainingSessions.organizerId, userId),
+        eq(trainingSessions.partnerId, userId)
+      ))
+      .orderBy(desc(trainingSessions.sessionDate));
+  }
+
+  async updateTrainingSession(sessionId: number, updates: Partial<InsertTrainingSession>): Promise<TrainingSession> {
+    const [updatedSession] = await db
+      .update(trainingSessions)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(trainingSessions.id, sessionId))
+      .returning();
+    return updatedSession;
+  }
+
+  async deleteTrainingSession(sessionId: number, userId: string): Promise<void> {
+    await db
+      .delete(trainingSessions)
+      .where(and(
+        eq(trainingSessions.id, sessionId),
+        or(
+          eq(trainingSessions.organizerId, userId),
+          eq(trainingSessions.partnerId, userId)
+        )
       ));
   }
 }
