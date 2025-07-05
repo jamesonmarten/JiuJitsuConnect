@@ -141,7 +141,7 @@ export class DatabaseStorage implements IStorage {
     }
 
     if (filters?.location && filters.location !== "all") {
-      conditions.push(eq(profiles.location, filters.location));
+      conditions.push(ilike(profiles.location, `%${filters.location}%`));
     }
 
     if (filters?.role && filters.role !== "all") {
