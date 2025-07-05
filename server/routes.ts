@@ -516,6 +516,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete('/api/training-sessions/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const sessionId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      
+      await storage.deleteTrainingSession(sessionId, userId);
+      res.json({ success: true, message: "Training session deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting training session:", error);
+      res.status(400).json({ message: "Failed to delete training session" });
+    }
+  });
+
   // Seed MMA members endpoint (for development)
   app.post('/api/seed-members', async (req, res) => {
     try {
