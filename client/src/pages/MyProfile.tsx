@@ -1,13 +1,122 @@
+import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Edit, BookOpen, Camera, Settings, Award } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { User, Edit, BookOpen, Camera, Settings, Award, Plus, Upload } from "lucide-react";
 import { Link } from "wouter";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function MyProfile() {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  const [journalModalOpen, setJournalModalOpen] = useState(false);
+  const [mediaModalOpen, setMediaModalOpen] = useState(false);
+  const [journalForm, setJournalForm] = useState({
+    sessionType: "",
+    duration: "",
+    techniques: "",
+    mood: "",
+    notes: "",
+  });
+  const [mediaForm, setMediaForm] = useState({
+    title: "",
+    description: "",
+    mediaType: "",
+    techniques: "",
+    isPublic: false,
+  });
+
+  const createJournalMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return apiRequest("/api/journal-entries", "POST", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/journal-entries"] });
+      setJournalModalOpen(false);
+      setJournalForm({
+        sessionType: "",
+        duration: "",
+        techniques: "",
+        mood: "",
+        notes: "",
+      });
+      toast({
+        title: "Journal Entry Added",
+        description: "Your training session has been logged successfully.",
+      });
+    },
+  });
+
+  const createMediaMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return apiRequest("/api/training-media", "POST", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/training-media"] });
+      setMediaModalOpen(false);
+      setMediaForm({
+        title: "",
+        description: "",
+        mediaType: "",
+        techniques: "",
+        isPublic: false,
+      });
+      toast({
+        title: "Media Uploaded",
+        description: "Your training media has been added successfully.",
+      });
+    },
+  });
+
+  const handleJournalSubmit = () => {
+    if (!journalForm.sessionType || !journalForm.duration || !journalForm.mood) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    createJournalMutation.mutate({
+      sessionType: journalForm.sessionType,
+      duration: parseInt(journalForm.duration),
+      techniques: journalForm.techniques,
+      mood: journalForm.mood,
+      notes: journalForm.notes,
+    });
+  };
+
+  const handleMediaSubmit = () => {
+    if (!mediaForm.title || !mediaForm.mediaType) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    createMediaMutation.mutate({
+      title: mediaForm.title,
+      description: mediaForm.description,
+      mediaType: mediaForm.mediaType,
+      techniques: mediaForm.techniques,
+      isPublic: mediaForm.isPublic,
+      mediaUrl: "placeholder-url", // In real implementation, this would come from file upload
+    });
+  };
 
   if (!user) {
     return (
@@ -128,7 +237,12 @@ export default function MyProfile() {
             <p className="text-sm text-muted-foreground mb-4">
               Track your training sessions, mood, and progress
             </p>
-            <Button className="w-full" size="sm">
+            <Button 
+              className="w-full" 
+              size="sm"
+              onClick={() => setJournalModalOpen(true)}
+            >
+              <Plus className="h-4 w-4 mr-2" />
               Add Journal Entry
             </Button>
           </CardContent>
@@ -141,7 +255,13 @@ export default function MyProfile() {
             <p className="text-sm text-muted-foreground mb-4">
               Upload photos and videos from your sparring sessions
             </p>
-            <Button variant="outline" className="w-full" size="sm">
+            <Button 
+              variant="outline" 
+              className="w-full" 
+              size="sm"
+              onClick={() => setMediaModalOpen(true)}
+            >
+              <Upload className="h-4 w-4 mr-2" />
               Upload Media
             </Button>
           </CardContent>
@@ -205,6 +325,194 @@ export default function MyProfile() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Journal Entry Modal */}
+      <Dialog open={journalModalOpen} onOpenChange={setJournalModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5" />
+              Add Journal Entry
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="sessionType">Session Type *</Label>
+              <Select value={journalForm.sessionType} onValueChange={(value) => 
+                setJournalForm(prev => ({ ...prev, sessionType: value }))
+              }>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select session type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="drilling">Drilling</SelectItem>
+                  <SelectItem value="rolling">Rolling</SelectItem>
+                  <SelectItem value="sparring">Sparring</SelectItem>
+                  <SelectItem value="technique">Technique Class</SelectItem>
+                  <SelectItem value="conditioning">Conditioning</SelectItem>
+                  <SelectItem value="open_mat">Open Mat</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="duration">Duration (minutes) *</Label>
+              <Input
+                id="duration"
+                type="number"
+                placeholder="90"
+                value={journalForm.duration}
+                onChange={(e) => setJournalForm(prev => ({ ...prev, duration: e.target.value }))}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="mood">Mood *</Label>
+              <Select value={journalForm.mood} onValueChange={(value) => 
+                setJournalForm(prev => ({ ...prev, mood: value }))
+              }>
+                <SelectTrigger>
+                  <SelectValue placeholder="How did you feel?" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="excellent">😄 Excellent</SelectItem>
+                  <SelectItem value="good">😊 Good</SelectItem>
+                  <SelectItem value="neutral">😐 Neutral</SelectItem>
+                  <SelectItem value="challenging">😅 Challenging</SelectItem>
+                  <SelectItem value="frustrated">😤 Frustrated</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="techniques">Techniques Practiced</Label>
+              <Input
+                id="techniques"
+                placeholder="Guard passes, submissions, etc."
+                value={journalForm.techniques}
+                onChange={(e) => setJournalForm(prev => ({ ...prev, techniques: e.target.value }))}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="notes">Notes</Label>
+              <Textarea
+                id="notes"
+                placeholder="Thoughts, lessons learned, goals for next session..."
+                value={journalForm.notes}
+                onChange={(e) => setJournalForm(prev => ({ ...prev, notes: e.target.value }))}
+              />
+            </div>
+
+            <div className="flex gap-2 pt-4">
+              <Button 
+                onClick={() => setJournalModalOpen(false)} 
+                variant="outline" 
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleJournalSubmit} 
+                disabled={createJournalMutation.isPending}
+                className="flex-1"
+              >
+                {createJournalMutation.isPending ? "Adding..." : "Add Entry"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Media Upload Modal */}
+      <Dialog open={mediaModalOpen} onOpenChange={setMediaModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Camera className="h-5 w-5" />
+              Upload Training Media
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="title">Title *</Label>
+              <Input
+                id="title"
+                placeholder="Sparring session highlights"
+                value={mediaForm.title}
+                onChange={(e) => setMediaForm(prev => ({ ...prev, title: e.target.value }))}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="mediaType">Media Type *</Label>
+              <Select value={mediaForm.mediaType} onValueChange={(value) => 
+                setMediaForm(prev => ({ ...prev, mediaType: value }))
+              }>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select media type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="photo">Photo</SelectItem>
+                  <SelectItem value="video">Video</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="techniques">Techniques Featured</Label>
+              <Input
+                id="techniques"
+                placeholder="Guard pass, armbar, etc."
+                value={mediaForm.techniques}
+                onChange={(e) => setMediaForm(prev => ({ ...prev, techniques: e.target.value }))}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                placeholder="Describe what's happening in this media..."
+                value={mediaForm.description}
+                onChange={(e) => setMediaForm(prev => ({ ...prev, description: e.target.value }))}
+              />
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isPublic"
+                checked={mediaForm.isPublic}
+                onChange={(e) => setMediaForm(prev => ({ ...prev, isPublic: e.target.checked }))}
+                className="rounded"
+              />
+              <Label htmlFor="isPublic">Make this media public</Label>
+            </div>
+
+            <div className="text-sm text-muted-foreground bg-blue-50 dark:bg-blue-950 p-3 rounded">
+              📝 Note: File upload functionality would be implemented here in a real application.
+            </div>
+
+            <div className="flex gap-2 pt-4">
+              <Button 
+                onClick={() => setMediaModalOpen(false)} 
+                variant="outline" 
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleMediaSubmit} 
+                disabled={createMediaMutation.isPending}
+                className="flex-1"
+              >
+                {createMediaMutation.isPending ? "Uploading..." : "Upload Media"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
