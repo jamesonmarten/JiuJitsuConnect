@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { MapPin, Phone, Globe, Star, Navigation, Clock, Users } from "lucide-react";
+import { MapPin, Phone, Globe, Star, Navigation, Clock, Users, Target, Search, Loader2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 interface Gym {
   id: string;
@@ -18,270 +20,377 @@ interface Gym {
   specialties: string[];
   description: string;
   priceRange: string;
+  lat?: number;
+  lng?: number;
 }
 
-// Sample gym data for Orlando/Longwood area
-const SAMPLE_GYMS: Gym[] = [
-  {
-    id: "1",
-    name: "American Top Team Orlando",
-    address: "3831 Vineland Rd, Orlando, FL 32811",
-    phone: "(407) 237-2801",
-    website: "https://attorlando.com",
-    rating: 4.8,
-    distance: "2.3 miles",
-    hours: "Mon-Fri 6AM-9PM, Sat-Sun 8AM-6PM",
-    specialties: ["Brazilian Jiu-Jitsu", "MMA", "Muay Thai", "Wrestling"],
-    description: "Premier MMA training facility with world-class instructors and competitive teams.",
-    priceRange: "$$$"
-  },
-  {
-    id: "2",
-    name: "Gracie Barra Orlando",
-    address: "6000 Westwood Blvd, Orlando, FL 32821",
-    phone: "(407) 233-8600",
-    website: "https://graciebarra.com",
-    rating: 4.7,
-    distance: "3.1 miles",
-    hours: "Mon-Fri 6AM-9PM, Sat 9AM-2PM",
-    specialties: ["Brazilian Jiu-Jitsu", "Self-Defense", "Kids Classes"],
-    description: "Traditional Brazilian Jiu-Jitsu school with strong fundamentals program.",
-    priceRange: "$$"
-  },
-  {
-    id: "3",
-    name: "Orlando MMA Academy",
-    address: "1425 Tuskawilla Rd, Winter Springs, FL 32708",
-    phone: "(407) 695-5425",
-    website: "https://orlandomma.com",
-    rating: 4.6,
-    distance: "5.2 miles",
-    hours: "Mon-Sat 6AM-9PM, Sun 10AM-4PM",
-    specialties: ["MMA", "BJJ", "Kickboxing", "Wrestling"],
-    description: "Full-service MMA gym with cage training and professional coaching.",
-    priceRange: "$$$"
-  },
-  {
-    id: "4",
-    name: "Longwood Martial Arts",
-    address: "150 Wilshire Dr, Longwood, FL 32750",
-    phone: "(407) 332-4800",
-    rating: 4.4,
-    distance: "1.8 miles",
-    hours: "Mon-Fri 4PM-9PM, Sat 9AM-3PM",
-    specialties: ["Brazilian Jiu-Jitsu", "Karate", "Kids Programs"],
-    description: "Family-friendly martial arts school with beginner-friendly programs.",
-    priceRange: "$"
-  },
-  {
-    id: "5",
-    name: "Elite Training Center",
-    address: "2156 W State Rd 434, Longwood, FL 32779",
-    phone: "(407) 774-5867",
-    rating: 4.5,
-    distance: "2.7 miles",
-    hours: "Mon-Fri 5AM-10PM, Sat-Sun 7AM-8PM",
-    specialties: ["CrossFit", "BJJ", "Boxing", "Personal Training"],
-    description: "Multi-discipline training facility with strength and conditioning focus.",
-    priceRange: "$$"
-  }
-];
+interface LocationState {
+  lat: number | null;
+  lng: number | null;
+  address: string;
+  isUsingGeolocation: boolean;
+  locationError: string | null;
+}
 
 export default function GymFinder() {
   const { toast } = useToast();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSpecialty, setSelectedSpecialty] = useState("all");
-  const [userLocation, setUserLocation] = useState("");
+  const [location, setLocation] = useState<LocationState>({
+    lat: null,
+    lng: null,
+    address: "",
+    isUsingGeolocation: false,
+    locationError: null,
+  });
+  const [searchRadius, setSearchRadius] = useState("10");
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
 
-  const filteredGyms = SAMPLE_GYMS.filter(gym => {
-    const matchesSearch = gym.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         gym.address.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesSpecialty = selectedSpecialty === "all" || 
-                            gym.specialties.some(spec => spec.toLowerCase().includes(selectedSpecialty.toLowerCase()));
-    return matchesSearch && matchesSpecialty;
+  // Get user's current location
+  const getCurrentLocation = () => {
+    setIsGettingLocation(true);
+    setLocation(prev => ({ ...prev, locationError: null }));
+
+    if (!navigator.geolocation) {
+      const error = "Geolocation is not supported by this browser";
+      setLocation(prev => ({ ...prev, locationError: error }));
+      setIsGettingLocation(false);
+      toast({
+        title: "Location Error",
+        description: error,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          address: "",
+          isUsingGeolocation: true,
+          locationError: null,
+        });
+        setIsGettingLocation(false);
+        toast({
+          title: "Location Found",
+          description: "Using your current location to find nearby gyms.",
+        });
+      },
+      (error) => {
+        let errorMessage = "Unable to get your location";
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = "Location access denied. Please enter an address manually.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "Location information unavailable. Please enter an address manually.";
+            break;
+          case error.TIMEOUT:
+            errorMessage = "Location request timed out. Please try again or enter an address manually.";
+            break;
+        }
+        
+        setLocation(prev => ({ ...prev, locationError: errorMessage }));
+        setIsGettingLocation(false);
+        toast({
+          title: "Location Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000, // 5 minutes
+      }
+    );
+  };
+
+  // Handle manual address input
+  const handleAddressSearch = () => {
+    if (!location.address.trim()) {
+      toast({
+        title: "Address Required",
+        description: "Please enter a zip code or address to search.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLocation(prev => ({
+      ...prev,
+      lat: null,
+      lng: null,
+      isUsingGeolocation: false,
+      locationError: null,
+    }));
+  };
+
+  // Auto-get location on component mount
+  useEffect(() => {
+    getCurrentLocation();
+  }, []);
+
+  // Query gyms based on location
+  const { data: gyms = [], isLoading, error } = useQuery<Gym[]>({
+    queryKey: ["/api/gyms/search", location.lat, location.lng, location.address, searchRadius],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      
+      if (location.lat && location.lng) {
+        params.append("lat", location.lat.toString());
+        params.append("lng", location.lng.toString());
+      } else if (location.address) {
+        params.append("address", location.address);
+      } else {
+        throw new Error("No location specified");
+      }
+      
+      params.append("radius", searchRadius);
+      
+      const response = await fetch(`/api/gyms/search?${params}`, {
+        credentials: "include",
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to fetch gyms");
+      }
+      
+      return response.json();
+    },
+    enabled: !!(location.lat && location.lng) || !!location.address,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  const handleGetDirections = (address: string) => {
-    const encodedAddress = encodeURIComponent(address);
-    window.open(`https://maps.google.com/maps?q=${encodedAddress}`, '_blank');
-  };
-
-  const handleCallGym = (phone: string) => {
-    window.open(`tel:${phone}`);
-  };
-
-  const handleVisitWebsite = (website: string) => {
-    window.open(website, '_blank');
-  };
-
-  // Easter egg: Special gym unlock
-  const handleSecretGym = () => {
-    toast({
-      title: "🏛️ Secret Dojo Unlocked!",
-      description: "You've discovered the legendary underground training facility. Respect!",
-    });
-    console.log("🥋 Secret dojo unlocked! The ancient art of debugging awaits...");
-  };
+  const hasLocation = (location.lat && location.lng) || location.address;
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
-          Find MMA Gyms Near You 🥊
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+          Find Gyms & Training Centers
         </h1>
-        <p className="text-muted-foreground">
-          Discover the best martial arts and MMA training facilities in your area
+        <p className="text-gray-600 dark:text-gray-300">
+          Discover martial arts gyms and training facilities near you
         </p>
       </div>
 
-      {/* Search and Filters */}
-      <div className="mb-8 space-y-4">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <Input
-              placeholder="Search gyms by name or location..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full"
-            />
+      {/* Location Controls */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="h-5 w-5" />
+            Location Settings
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <div className="flex gap-2">
+                <Button
+                  onClick={getCurrentLocation}
+                  disabled={isGettingLocation}
+                  className="flex items-center gap-2"
+                >
+                  {isGettingLocation ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Navigation className="h-4 w-4" />
+                  )}
+                  {isGettingLocation ? "Getting Location..." : "Use My Location"}
+                </Button>
+                
+                {location.isUsingGeolocation && location.lat && location.lng && (
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <Target className="h-3 w-3" />
+                    Using GPS Location
+                  </Badge>
+                )}
+              </div>
+              
+              {location.locationError && (
+                <p className="text-sm text-red-600 dark:text-red-400 mt-2">
+                  {location.locationError}
+                </p>
+              )}
+            </div>
           </div>
-          <div className="w-full md:w-48">
-            <select
-              value={selectedSpecialty}
-              onChange={(e) => setSelectedSpecialty(e.target.value)}
-              className="w-full px-3 py-2 border rounded-md bg-background"
-            >
-              <option value="all">All Specialties</option>
-              <option value="brazilian jiu-jitsu">Brazilian Jiu-Jitsu</option>
-              <option value="mma">MMA</option>
-              <option value="muay thai">Muay Thai</option>
-              <option value="boxing">Boxing</option>
-              <option value="wrestling">Wrestling</option>
-              <option value="kickboxing">Kickboxing</option>
-            </select>
-          </div>
-        </div>
 
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <MapPin className="h-4 w-4" />
-          <span>Showing gyms near Longwood, Orlando, FL</span>
-        </div>
-      </div>
+          <div className="border-t pt-4">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <Input
+                  placeholder="Or enter zip code / address manually..."
+                  value={location.address}
+                  onChange={(e) => setLocation(prev => ({ ...prev, address: e.target.value }))}
+                  onKeyPress={(e) => e.key === 'Enter' && handleAddressSearch()}
+                />
+              </div>
+              <Button 
+                onClick={handleAddressSearch}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <Search className="h-4 w-4" />
+                Search Address
+              </Button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <label className="text-sm font-medium">Search Radius:</label>
+            <Select value={searchRadius} onValueChange={setSearchRadius}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="5">5 miles</SelectItem>
+                <SelectItem value="10">10 miles</SelectItem>
+                <SelectItem value="15">15 miles</SelectItem>
+                <SelectItem value="25">25 miles</SelectItem>
+                <SelectItem value="50">50 miles</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Results */}
-      <div className="grid gap-6">
-        {filteredGyms.map((gym) => (
-          <Card key={gym.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="text-xl">{gym.name}</CardTitle>
-                  <div className="flex items-center gap-2 mt-1">
+      {!hasLocation ? (
+        <Card className="p-12 text-center">
+          <Target className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+          <h3 className="text-xl font-semibold mb-2">Set Your Location</h3>
+          <p className="text-gray-600 dark:text-gray-300 mb-4">
+            Allow location access or enter your address to find nearby gyms and training centers.
+          </p>
+        </Card>
+      ) : isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <Card key={i} className="animate-pulse">
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                  <div className="flex gap-2">
+                    <div className="h-6 bg-gray-200 rounded w-16"></div>
+                    <div className="h-6 bg-gray-200 rounded w-16"></div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : error ? (
+        <Card className="p-12 text-center">
+          <div className="text-red-500 mb-4">
+            <Search className="h-16 w-16 mx-auto" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">Search Error</h3>
+          <p className="text-gray-600 dark:text-gray-300">
+            Unable to find gyms in your area. Please try a different location or check your internet connection.
+          </p>
+        </Card>
+      ) : gyms.length === 0 ? (
+        <Card className="p-12 text-center">
+          <Search className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+          <h3 className="text-xl font-semibold mb-2">No Gyms Found</h3>
+          <p className="text-gray-600 dark:text-gray-300 mb-4">
+            We couldn't find any martial arts gyms in your search area. Try expanding your search radius or checking a different location.
+          </p>
+          <Button onClick={() => setSearchRadius("25")} variant="outline">
+            Expand Search to 25 Miles
+          </Button>
+        </Card>
+      ) : (
+        <>
+          <div className="mb-4">
+            <p className="text-gray-600 dark:text-gray-300">
+              Found {gyms.length} gym{gyms.length !== 1 ? 's' : ''} within {searchRadius} miles
+              {location.isUsingGeolocation ? " of your location" : location.address ? ` of ${location.address}` : ""}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {gyms.map((gym) => (
+              <Card key={gym.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-start">
+                    <CardTitle className="text-lg">{gym.name}</CardTitle>
                     <div className="flex items-center gap-1">
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="font-medium">{gym.rating}</span>
+                      <span className="text-sm font-medium">{gym.rating.toFixed(1)}</span>
                     </div>
-                    <span className="text-muted-foreground">•</span>
-                    <span className="text-muted-foreground">{gym.distance}</span>
-                    <span className="text-muted-foreground">•</span>
-                    <span className="text-muted-foreground">{gym.priceRange}</span>
                   </div>
-                </div>
-                <Badge variant="secondary" className="bg-red-100 text-red-700">
-                  Open
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {/* Description */}
-                <p className="text-muted-foreground">{gym.description}</p>
-
-                {/* Specialties */}
-                <div className="flex flex-wrap gap-2">
-                  {gym.specialties.map((specialty, index) => (
-                    <Badge key={index} variant="outline" className="text-xs">
-                      {specialty}
-                    </Badge>
-                  ))}
-                </div>
-
-                {/* Info Grid */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{gym.address}</span>
+                </CardHeader>
+                
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                    <MapPin className="h-4 w-4" />
+                    {gym.address}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Phone className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{gym.phone}</span>
+                  
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                    <Navigation className="h-4 w-4" />
+                    {gym.distance}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{gym.hours}</span>
-                  </div>
-                  {gym.website && (
-                    <div className="flex items-center gap-2">
-                      <Globe className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm text-blue-600 hover:underline cursor-pointer"
-                            onClick={() => handleVisitWebsite(gym.website!)}>
-                        Visit Website
-                      </span>
+                  
+                  {gym.phone && (
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                      <Phone className="h-4 w-4" />
+                      {gym.phone}
                     </div>
                   )}
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex gap-2 pt-2">
-                  <Button 
-                    onClick={() => handleGetDirections(gym.address)}
-                    className="flex-1"
-                  >
-                    <Navigation className="h-4 w-4 mr-2" />
-                    Get Directions
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    onClick={() => handleCallGym(gym.phone)}
-                  >
-                    <Phone className="h-4 w-4 mr-2" />
-                    Call
-                  </Button>
-                  {gym.website && (
-                    <Button 
-                      variant="outline"
-                      onClick={() => handleVisitWebsite(gym.website!)}
+                  
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                    <Clock className="h-4 w-4" />
+                    {gym.hours}
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-1">
+                    {gym.specialties.map((specialty, index) => (
+                      <Badge key={index} variant="secondary" className="text-xs">
+                        {specialty}
+                      </Badge>
+                    ))}
+                  </div>
+                  
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    {gym.description}
+                  </p>
+                  
+                  <div className="flex gap-2 pt-4 border-t">
+                    {gym.website && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => window.open(gym.website, "_blank")}
+                        className="flex-1"
+                      >
+                        <Globe className="h-4 w-4 mr-1" />
+                        Website
+                      </Button>
+                    )}
+                    
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        const query = encodeURIComponent(gym.address);
+                        window.open(`https://maps.google.com/maps?q=${query}`, "_blank");
+                      }}
+                      className="flex-1"
                     >
-                      <Globe className="h-4 w-4 mr-2" />
-                      Website
+                      <MapPin className="h-4 w-4 mr-1" />
+                      Directions
                     </Button>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* No Results */}
-      {filteredGyms.length === 0 && (
-        <div className="text-center py-12">
-          <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No gyms found</h3>
-          <p className="text-muted-foreground">
-            Try adjusting your search criteria or check back later for new listings.
-          </p>
-        </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </>
       )}
-
-      {/* Easter Egg */}
-      <div className="mt-12 text-center">
-        <p className="text-xs text-muted-foreground cursor-pointer hover:text-primary transition-colors"
-           onClick={handleSecretGym}>
-          🥋 Psst... Click here to unlock the secret dojo
-        </p>
-      </div>
     </div>
   );
 }

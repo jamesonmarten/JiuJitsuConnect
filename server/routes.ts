@@ -557,6 +557,162 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Find gyms near location
+  app.get('/api/gyms/search', async (req, res) => {
+    try {
+      const { lat, lng, address, radius = 10 } = req.query;
+      
+      let searchLat = parseFloat(lat as string);
+      let searchLng = parseFloat(lng as string);
+      const searchRadius = parseFloat(radius as string);
+      
+      // If address is provided, geocode it first
+      if (address && !lat && !lng) {
+        try {
+          const geocodeResponse = await fetch(
+            `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(address as string)}&key=${process.env.OPENCAGE_API_KEY}`
+          );
+          const geocodeData = await geocodeResponse.json();
+          
+          if (geocodeData.results && geocodeData.results.length > 0) {
+            searchLat = geocodeData.results[0].geometry.lat;
+            searchLng = geocodeData.results[0].geometry.lng;
+          } else {
+            return res.status(400).json({ message: "Could not find location" });
+          }
+        } catch (geocodeError) {
+          console.error("Geocoding error:", geocodeError);
+          return res.status(500).json({ message: "Geocoding failed" });
+        }
+      }
+      
+      if (!searchLat || !searchLng) {
+        return res.status(400).json({ message: "Location coordinates required" });
+      }
+      
+      // Search for gyms using OpenStreetMap Overpass API
+      const overpassQuery = `
+        [out:json][timeout:25];
+        (
+          node["leisure"="fitness_centre"][name~"jiu.jitsu|bjj|mma|martial.arts|karate|taekwondo|kickboxing|muay.thai|boxing|wrestling",i](around:${searchRadius * 1609.34},${searchLat},${searchLng});
+          node["leisure"="sports_centre"][name~"jiu.jitsu|bjj|mma|martial.arts|karate|taekwondo|kickboxing|muay.thai|boxing|wrestling",i](around:${searchRadius * 1609.34},${searchLat},${searchLng});
+          node["sport"="martial_arts"](around:${searchRadius * 1609.34},${searchLat},${searchLng});
+          way["leisure"="fitness_centre"][name~"jiu.jitsu|bjj|mma|martial.arts|karate|taekwondo|kickboxing|muay.thai|boxing|wrestling",i](around:${searchRadius * 1609.34},${searchLat},${searchLng});
+          way["leisure"="sports_centre"][name~"jiu.jitsu|bjj|mma|martial.arts|karate|taekwondo|kickboxing|muay.thai|boxing|wrestling",i](around:${searchRadius * 1609.34},${searchLat},${searchLng});
+          way["sport"="martial_arts"](around:${searchRadius * 1609.34},${searchLat},${searchLng});
+        );
+        out center;
+      `;
+      
+      const overpassResponse = await fetch('https://overpass-api.de/api/interpreter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `data=${encodeURIComponent(overpassQuery)}`,
+      });
+      
+      if (!overpassResponse.ok) {
+        throw new Error('Overpass API request failed');
+      }
+      
+      const overpassData = await overpassResponse.json();
+      
+      // Process and format the gym data
+      const gyms = overpassData.elements.map((element: any) => {
+        const lat = element.lat || element.center?.lat;
+        const lon = element.lon || element.center?.lon;
+        const distance = calculateDistance(searchLat, searchLng, lat, lon);
+        
+        return {
+          id: element.id.toString(),
+          name: element.tags?.name || "Martial Arts Gym",
+          address: formatAddress(element.tags),
+          phone: element.tags?.phone || "",
+          website: element.tags?.website || element.tags?.["contact:website"] || "",
+          rating: 4.0 + Math.random() * 1.0, // Placeholder rating
+          distance: `${distance.toFixed(1)} miles`,
+          hours: element.tags?.opening_hours || "Hours vary",
+          specialties: extractSpecialties(element.tags?.name || "", element.tags?.sport || ""),
+          description: generateDescription(element.tags),
+          priceRange: "$$",
+          lat,
+          lng: lon,
+        };
+      }).filter((gym: any) => gym.lat && gym.lng);
+      
+      // Sort by distance
+      gyms.sort((a: any, b: any) => parseFloat(a.distance) - parseFloat(b.distance));
+      
+      res.json(gyms);
+    } catch (error) {
+      console.error("Error searching gyms:", error);
+      res.status(500).json({ message: "Failed to search gyms" });
+    }
+  });
+
+  function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 3959; // Earth's radius in miles
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }
+
+  function formatAddress(tags: any): string {
+    const parts = [];
+    if (tags['addr:housenumber']) parts.push(tags['addr:housenumber']);
+    if (tags['addr:street']) parts.push(tags['addr:street']);
+    if (tags['addr:city']) parts.push(tags['addr:city']);
+    if (tags['addr:state']) parts.push(tags['addr:state']);
+    if (tags['addr:postcode']) parts.push(tags['addr:postcode']);
+    
+    return parts.length > 0 ? parts.join(' ') : "Address not available";
+  }
+
+  function extractSpecialties(name: string, sport: string): string[] {
+    const specialties = [];
+    const lowerName = name.toLowerCase();
+    const lowerSport = sport.toLowerCase();
+    
+    if (lowerName.includes('jiu jitsu') || lowerName.includes('bjj') || lowerSport.includes('jiu_jitsu')) {
+      specialties.push('Brazilian Jiu-Jitsu');
+    }
+    if (lowerName.includes('mma') || lowerName.includes('mixed martial arts')) {
+      specialties.push('MMA');
+    }
+    if (lowerName.includes('muay thai') || lowerName.includes('thai boxing')) {
+      specialties.push('Muay Thai');
+    }
+    if (lowerName.includes('boxing') && !lowerName.includes('kickboxing')) {
+      specialties.push('Boxing');
+    }
+    if (lowerName.includes('kickboxing')) {
+      specialties.push('Kickboxing');
+    }
+    if (lowerName.includes('karate')) {
+      specialties.push('Karate');
+    }
+    if (lowerName.includes('taekwondo')) {
+      specialties.push('Taekwondo');
+    }
+    if (lowerName.includes('wrestling')) {
+      specialties.push('Wrestling');
+    }
+    
+    return specialties.length > 0 ? specialties : ['Martial Arts'];
+  }
+
+  function generateDescription(tags: any): string {
+    const name = tags?.name || "Martial Arts Gym";
+    const sport = tags?.sport || "martial arts";
+    
+    return `${name} offers ${sport} training with experienced instructors in a welcoming environment.`;
+  }
+
   const httpServer = createServer(app);
   return httpServer;
 }
