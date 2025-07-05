@@ -527,6 +527,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create test training session (for development)
+  app.post('/api/create-test-session', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Create a test session for tomorrow
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(14, 0, 0, 0); // 2 PM tomorrow
+      
+      const sessionData = {
+        organizerId: userId,
+        partnerId: "amanda-nunes", // Use one of our seeded fighters
+        gymName: "Orlando BJJ Academy",
+        gymAddress: "123 Training St, Orlando, FL 32801",
+        sessionDate: tomorrow,
+        duration: 90,
+        trainingType: "sparring",
+        notes: "Test session for debugging date display",
+        status: "confirmed"
+      };
+      
+      const session = await storage.createTrainingSession(sessionData);
+      res.json(session);
+    } catch (error) {
+      console.error("Error creating test session:", error);
+      res.status(400).json({ message: "Failed to create test session" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

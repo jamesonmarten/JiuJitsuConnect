@@ -64,6 +64,19 @@ export default function TrainingSessions() {
     },
   });
 
+  const createTestSessionMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("/api/create-test-session", "POST", {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/training-sessions"] });
+      toast({
+        title: "Test Session Created",
+        description: "A test training session has been created for debugging.",
+      });
+    },
+  });
+
   const handleStatusUpdate = (sessionId: number, newStatus: string) => {
     updateSessionMutation.mutate({
       id: sessionId,
@@ -130,12 +143,24 @@ export default function TrainingSessions() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-          Training Sessions
-        </h1>
-        <p className="text-gray-600 dark:text-gray-300">
-          Manage your scheduled training sessions and meetups
-        </p>
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+              Training Sessions
+            </h1>
+            <p className="text-gray-600 dark:text-gray-300">
+              Manage your scheduled training sessions and meetups
+            </p>
+          </div>
+          <Button 
+            onClick={() => createTestSessionMutation.mutate()}
+            disabled={createTestSessionMutation.isPending}
+            variant="outline"
+            className="text-xs"
+          >
+            {createTestSessionMutation.isPending ? "Creating..." : "Create Test Session"}
+          </Button>
+        </div>
       </div>
 
       {sessions.length === 0 ? (
@@ -166,14 +191,21 @@ export default function TrainingSessions() {
               </CardHeader>
               
               <CardContent className="space-y-4">
+                {session.partnerName && (
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                    <Users className="h-4 w-4" />
+                    Training with {session.partnerName}
+                  </div>
+                )}
+                
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                   <Calendar className="h-4 w-4" />
-                  {format(new Date(session.sessionDate), "PPP")}
+                  {format(new Date(session.sessionDate), "EEEE, MMMM do, yyyy")}
                 </div>
                 
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                   <Clock className="h-4 w-4" />
-                  {format(new Date(session.sessionDate), "p")} ({session.duration} min)
+                  {format(new Date(session.sessionDate), "h:mm a")} ({session.duration} min)
                 </div>
                 
                 {session.gymAddress && (

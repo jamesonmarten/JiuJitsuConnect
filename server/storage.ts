@@ -535,14 +535,37 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTrainingSessions(userId: string): Promise<TrainingSession[]> {
-    return await db
-      .select()
+    const sessions = await db
+      .select({
+        id: trainingSessions.id,
+        organizerId: trainingSessions.organizerId,
+        partnerId: trainingSessions.partnerId,
+        gymName: trainingSessions.gymName,
+        gymAddress: trainingSessions.gymAddress,
+        sessionDate: trainingSessions.sessionDate,
+        duration: trainingSessions.duration,
+        trainingType: trainingSessions.trainingType,
+        notes: trainingSessions.notes,
+        status: trainingSessions.status,
+        createdAt: trainingSessions.createdAt,
+        updatedAt: trainingSessions.updatedAt,
+        partnerName: users.firstName,
+        partnerLastName: users.lastName,
+      })
       .from(trainingSessions)
+      .leftJoin(users, eq(users.id, trainingSessions.partnerId))
       .where(or(
         eq(trainingSessions.organizerId, userId),
         eq(trainingSessions.partnerId, userId)
       ))
       .orderBy(desc(trainingSessions.sessionDate));
+    
+    // Format the partner name
+    return sessions.map(session => ({
+      ...session,
+      partnerName: `${session.partnerName} ${session.partnerLastName}`.trim(),
+      partnerLastName: undefined, // Remove this field from the response
+    }));
   }
 
   async updateTrainingSession(sessionId: number, updates: Partial<InsertTrainingSession>): Promise<TrainingSession> {
