@@ -2,16 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Star, User } from "lucide-react";
+import { Users, Star, User, UserPlus, Search, Trophy } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Home() {
   const { user } = useAuth();
-  
-  console.log("Home component rendering with user:", user);
-  console.log("Home component DOM render at:", new Date().toLocaleTimeString());
 
-  const { data: stats, isLoading: statsLoading, error: statsError } = useQuery<{
+  const { data: stats, isLoading: statsLoading } = useQuery<{
     averageRating: number;
     totalReviews: number;
     activeMembers: number;
@@ -19,250 +16,169 @@ export default function Home() {
     queryKey: ["/api/ratings/stats"],
   });
 
-  console.log("Home stats:", { stats, statsLoading, statsError });
-
-  // Force render with explicit styling
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      backgroundColor: 'red', 
-      color: 'white',
-      padding: '2rem',
-      fontSize: '24px',
-      fontWeight: 'bold'
-    }}>
-      <div style={{ backgroundColor: 'blue', padding: '20px', margin: '20px' }}>
-        HOME PAGE IS RENDERING - {new Date().toLocaleTimeString()}
+    <div className="container mx-auto px-4 py-8">
+      {/* Welcome Section */}
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          Welcome back, {user?.firstName || 'Fighter'}! 🥋
+        </h1>
+        <p className="text-xl text-muted-foreground">
+          Connect with the Jiu-Jitsu community in Longwood & Orlando
+        </p>
       </div>
-      <div className="container mx-auto">
-        {/* Welcome Section - Always visible */}
-        <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
-          <h1 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 'bold', 
-            marginBottom: '1rem',
-            color: 'hsl(210, 24%, 16%)'
-          }}>
-            Welcome back, {user?.firstName || 'Fighter'}! 🥋
-          </h1>
-          <p style={{ 
-            color: 'hsl(215, 16%, 47%)', 
-            fontSize: '1.125rem' 
-          }}>
-            Connect with the Jiu-Jitsu community in Longwood & Orlando
-          </p>
-        </div>
 
-        {/* Stats Cards */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-          gap: '1.5rem',
-          marginBottom: '2rem'
-        }}>
-          <div style={{ 
-            backgroundColor: 'white', 
-            border: '1px solid hsl(214, 32%, 91%)',
-            borderRadius: '0.5rem',
-            padding: '1.5rem'
-          }}>
-            <div style={{ 
-              fontSize: '2rem', 
-              fontWeight: 'bold', 
-              color: 'hsl(210, 65%, 26%)' 
-            }}>
+      {/* Profile Setup Banner */}
+      {!user?.profile && (
+        <Card className="mb-8 border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <User className="h-8 w-8 text-orange-600" />
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-orange-900 dark:text-orange-100">
+                  Complete Your Profile
+                </h3>
+                <p className="text-orange-700 dark:text-orange-200">
+                  Set up your martial arts profile to connect with training partners and instructors.
+                </p>
+              </div>
+              <Link href="/profile-edit">
+                <Button className="bg-orange-600 hover:bg-orange-700">
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Setup Profile
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
+            <Star className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
               {statsLoading ? "..." : (stats?.averageRating?.toFixed(1) || "0.0")}
             </div>
-            <div style={{ color: 'hsl(215, 16%, 47%)' }}>Average Rating</div>
-          </div>
-          
-          <div style={{ 
-            backgroundColor: 'white', 
-            border: '1px solid hsl(214, 32%, 91%)',
-            borderRadius: '0.5rem',
-            padding: '1.5rem'
-          }}>
-            <div style={{ 
-              fontSize: '2rem', 
-              fontWeight: 'bold', 
-              color: 'hsl(210, 65%, 26%)' 
-            }}>
+            <p className="text-xs text-muted-foreground">
+              Community rating average
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Reviews</CardTitle>
+            <Trophy className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
               {statsLoading ? "..." : (stats?.totalReviews || 0)}
             </div>
-            <div style={{ color: 'hsl(215, 16%, 47%)' }}>Total Reviews</div>
-          </div>
-          
-          <div style={{ 
-            backgroundColor: 'white', 
-            border: '1px solid hsl(214, 32%, 91%)',
-            borderRadius: '0.5rem',
-            padding: '1.5rem'
-          }}>
-            <div style={{ 
-              fontSize: '2rem', 
-              fontWeight: 'bold', 
-              color: 'hsl(210, 65%, 26%)' 
-            }}>
+            <p className="text-xs text-muted-foreground">
+              Training session reviews
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Members</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
               {statsLoading ? "..." : (stats?.activeMembers || 0)}
             </div>
-            <div style={{ color: 'hsl(215, 16%, 47%)' }}>Active Members</div>
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
-          gap: '1.5rem',
-          marginBottom: '2rem'
-        }}>
-          <div style={{ 
-            backgroundColor: 'white', 
-            border: '1px solid hsl(214, 32%, 91%)',
-            borderRadius: '0.5rem',
-            padding: '1.5rem'
-          }}>
-            <h3 style={{ 
-              fontSize: '1.25rem', 
-              fontWeight: '600', 
-              marginBottom: '1rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem'
-            }}>
-              <Users size={20} style={{ color: 'hsl(210, 65%, 26%)' }} />
-              Find Training Partners
-            </h3>
-            <p style={{ 
-              color: 'hsl(215, 16%, 47%)', 
-              fontSize: '0.875rem',
-              marginBottom: '1rem'
-            }}>
-              Connect with other martial artists in your area
+            <p className="text-xs text-muted-foreground">
+              Community members
             </p>
-            <Link href="/explore">
-              <button style={{
-                width: '100%',
-                backgroundColor: 'hsl(210, 65%, 26%)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '0.375rem',
-                padding: '0.5rem 1rem',
-                fontSize: '0.875rem',
-                cursor: 'pointer'
-              }}>
-                Explore Community 🔍
-              </button>
-            </Link>
-          </div>
-
-          <div style={{ 
-            backgroundColor: 'white', 
-            border: '1px solid hsl(214, 32%, 91%)',
-            borderRadius: '0.5rem',
-            padding: '1.5rem'
-          }}>
-            <h3 style={{ 
-              fontSize: '1.25rem', 
-              fontWeight: '600', 
-              marginBottom: '1rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem'
-            }}>
-              <Star size={20} style={{ color: 'hsl(210, 65%, 26%)' }} />
-              Rate & Review
-            </h3>
-            <p style={{ 
-              color: 'hsl(215, 16%, 47%)', 
-              fontSize: '0.875rem',
-              marginBottom: '1rem'
-            }}>
-              Share your training experiences with others
-            </p>
-            <Link href="/ratings">
-              <button style={{
-                width: '100%',
-                backgroundColor: 'hsl(210, 65%, 26%)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '0.375rem',
-                padding: '0.5rem 1rem',
-                fontSize: '0.875rem',
-                cursor: 'pointer'
-              }}>
-                View Ratings ⭐
-              </button>
-            </Link>
-          </div>
-
-          <div style={{ 
-            backgroundColor: 'white', 
-            border: '1px solid hsl(214, 32%, 91%)',
-            borderRadius: '0.5rem',
-            padding: '1.5rem'
-          }}>
-            <h3 style={{ 
-              fontSize: '1.25rem', 
-              fontWeight: '600', 
-              marginBottom: '1rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem'
-            }}>
-              <User size={20} style={{ color: 'hsl(210, 65%, 26%)' }} />
-              My Profile
-            </h3>
-            <p style={{ 
-              color: 'hsl(215, 16%, 47%)', 
-              fontSize: '0.875rem',
-              marginBottom: '1rem'
-            }}>
-              Manage your profile and training journal
-            </p>
-            <Link href="/my-profile">
-              <button style={{
-                width: '100%',
-                backgroundColor: 'hsl(210, 65%, 26%)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '0.375rem',
-                padding: '0.5rem 1rem',
-                fontSize: '0.875rem',
-                cursor: 'pointer'
-              }}>
-                View Profile 👤
-              </button>
-            </Link>
-          </div>
-        </div>
-
-        {/* Debug info */}
-        <div style={{ 
-          backgroundColor: 'white', 
-          border: '1px solid hsl(214, 32%, 91%)',
-          borderRadius: '0.5rem',
-          padding: '1.5rem',
-          marginTop: '2rem'
-        }}>
-          <h3 style={{ 
-            fontSize: '1.25rem', 
-            fontWeight: '600', 
-            marginBottom: '1rem' 
-          }}>
-            Debug Info
-          </h3>
-          <div style={{ fontSize: '0.875rem' }}>
-            <p>User authenticated: {user ? "Yes" : "No"}</p>
-            <p>User ID: {user?.id || "None"}</p>
-            <p>User name: {user?.firstName} {user?.lastName}</p>
-            <p>Stats loading: {statsLoading ? "Yes" : "No"}</p>
-            <p>Stats error: {statsError ? String(statsError) : "None"}</p>
-            <p>Stats data: {JSON.stringify(stats)}</p>
-            <p>Current time: {new Date().toLocaleTimeString()}</p>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Search className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <CardTitle>Find Training Partners</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Discover martial artists in your area
+                </p>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Link href="/explore">
+              <Button className="w-full">
+                <Search className="h-4 w-4 mr-2" />
+                Explore Community
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <User className="h-6 w-6 text-purple-600" />
+              </div>
+              <div>
+                <CardTitle>Manage Profile</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Update your information and training journal
+                </p>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Link href="/my-profile">
+              <Button variant="outline" className="w-full">
+                <User className="h-4 w-4 mr-2" />
+                View Profile
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recent Activity Placeholder */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Activity</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <div className="text-muted-foreground mb-4">
+              No recent activity to show. Start by exploring the community or updating your profile!
+            </div>
+            <div className="flex gap-4 justify-center flex-wrap">
+              <Link href="/explore">
+                <Button>
+                  <Search className="h-4 w-4 mr-2" />
+                  Explore Community
+                </Button>
+              </Link>
+              <Link href="/profile-edit">
+                <Button variant="outline">
+                  <User className="h-4 w-4 mr-2" />
+                  Complete Profile
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

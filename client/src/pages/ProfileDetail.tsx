@@ -172,24 +172,19 @@ export default function ProfileDetail() {
             </CardContent>
           </Card>
 
-          {/* Location Map */}
+          {/* Location */}
           {user.profile?.location && (
             <Card>
               <CardHeader>
                 <CardTitle>Location</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="aspect-video rounded-lg overflow-hidden">
-                  <iframe
-                    src={`https://www.google.com/maps/embed/v1/place?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''}&q=${encodeURIComponent(user.profile.location + ', FL')}`}
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title="Location Map"
-                  />
+                <div className="flex items-center gap-3 p-4 bg-muted rounded-lg">
+                  <MapPin className="h-6 w-6 text-blue-600" />
+                  <div>
+                    <p className="font-medium">{user.profile.location}</p>
+                    <p className="text-sm text-muted-foreground">Training location</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
