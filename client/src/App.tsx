@@ -14,6 +14,7 @@ import MyProfile from "@/pages/MyProfile";
 import Ratings from "@/pages/Ratings";
 import InstructorNotes from "@/pages/InstructorNotes";
 import GymFinder from "@/pages/GymFinder";
+import Recommendations from "@/pages/Recommendations";
 import Navbar from "@/components/Navbar";
 
 function Router() {
@@ -54,6 +55,7 @@ function Router() {
           <Route path="/ratings" component={Ratings} />
           <Route path="/instructor-notes" component={InstructorNotes} />
           <Route path="/gym-finder" component={GymFinder} />
+          <Route path="/recommendations" component={Recommendations} />
           <Route component={NotFound} />
         </Switch>
       </main>

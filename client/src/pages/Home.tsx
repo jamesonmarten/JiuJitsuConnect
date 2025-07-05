@@ -169,6 +169,12 @@ export default function Home() {
                   Explore Community
                 </Button>
               </Link>
+              <Link href="/recommendations">
+                <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+                  <span className="mr-2">🧠</span>
+                  AI Match
+                </Button>
+              </Link>
               <Link href="/gym-finder">
                 <Button variant="outline">
                   <Trophy className="h-4 w-4 mr-2" />

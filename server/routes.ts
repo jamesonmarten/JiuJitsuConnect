@@ -11,6 +11,11 @@ import {
 } from "@shared/schema";
 import { z } from "zod";
 import { seedMMAMembers } from "./seedMembers";
+import { 
+  generateTrainingPartnerRecommendations, 
+  generatePersonalizedTrainingPlan,
+  type RecommendationCriteria 
+} from "./aiRecommendations";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -361,6 +366,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error unfollowing user:", error);
       res.status(500).json({ message: "Failed to unfollow user" });
+    }
+  });
+
+  // AI-Powered Training Partner Recommendations
+  app.get('/api/recommendations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const currentUser = await storage.getUserWithProfile(userId);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User profile not found" });
+      }
+
+      // Get all available users for recommendations
+      const allUsers = await storage.getUsersWithProfiles();
+      
+      const criteria: RecommendationCriteria = {
+        currentUser,
+        availablePartners: allUsers,
+        maxRecommendations: parseInt(req.query.limit as string) || 5
+      };
+
+      const recommendations = await generateTrainingPartnerRecommendations(criteria);
+      
+      res.json(recommendations);
+    } catch (error) {
+      console.error("Error generating recommendations:", error);
+      res.status(500).json({ message: "Failed to generate recommendations" });
+    }
+  });
+
+  // Personalized Training Plan Generator
+  app.post('/api/training-plan', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { partnerId } = req.body;
+      
+      const currentUser = await storage.getUserWithProfile(userId);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User profile not found" });
+      }
+
+      let partner;
+      if (partnerId) {
+        partner = await storage.getUserWithProfile(partnerId);
+      }
+
+      const trainingPlan = await generatePersonalizedTrainingPlan(currentUser, partner);
+      
+      res.json(trainingPlan);
+    } catch (error) {
+      console.error("Error generating training plan:", error);
+      res.status(500).json({ message: "Failed to generate training plan" });
     }
   });
 
