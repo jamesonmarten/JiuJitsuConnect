@@ -135,7 +135,7 @@ export default function TrainingSessionModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Gym Information */}
           <div className="space-y-2">
-            <Label htmlFor="gymName">Gym/Location *</Label>
+            <Label htmlFor="gymName">Gym/Location <span className="text-red-500">*</span></Label>
             <Input
               id="gymName"
               placeholder="e.g., ATT Orlando, Roufusport Orlando"
@@ -158,7 +158,7 @@ export default function TrainingSessionModal({
           {/* Date and Time */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label htmlFor="sessionDate">Date *</Label>
+              <Label htmlFor="sessionDate">Date <span className="text-red-500">*</span></Label>
               <Input
                 id="sessionDate"
                 type="date"
@@ -170,7 +170,7 @@ export default function TrainingSessionModal({
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="sessionTime">Time *</Label>
+              <Label htmlFor="sessionTime">Time <span className="text-red-500">*</span></Label>
               <Input
                 id="sessionTime"
                 type="time"
@@ -184,7 +184,7 @@ export default function TrainingSessionModal({
           {/* Training Details */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label htmlFor="trainingType">Training Type *</Label>
+              <Label htmlFor="trainingType">Training Type <span className="text-red-500">*</span></Label>
               <Select value={formData.trainingType} onValueChange={(value) => handleInputChange("trainingType", value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select type" />

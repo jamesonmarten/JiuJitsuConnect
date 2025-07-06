@@ -337,7 +337,7 @@ export default function MyProfile() {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="sessionType">Session Type *</Label>
+              <Label htmlFor="sessionType">Session Type <span className="text-red-500">*</span></Label>
               <Select value={journalForm.sessionType} onValueChange={(value) => 
                 setJournalForm(prev => ({ ...prev, sessionType: value }))
               }>
@@ -356,7 +356,7 @@ export default function MyProfile() {
             </div>
 
             <div>
-              <Label htmlFor="duration">Duration (minutes) *</Label>
+              <Label htmlFor="duration">Duration (minutes) <span className="text-red-500">*</span></Label>
               <Input
                 id="duration"
                 type="number"
@@ -367,7 +367,7 @@ export default function MyProfile() {
             </div>
 
             <div>
-              <Label htmlFor="mood">Mood *</Label>
+              <Label htmlFor="mood">Mood <span className="text-red-500">*</span></Label>
               <Select value={journalForm.mood} onValueChange={(value) => 
                 setJournalForm(prev => ({ ...prev, mood: value }))
               }>
@@ -435,7 +435,7 @@ export default function MyProfile() {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="title">Title *</Label>
+              <Label htmlFor="title">Title <span className="text-red-500">*</span></Label>
               <Input
                 id="title"
                 placeholder="Sparring session highlights"
@@ -445,7 +445,7 @@ export default function MyProfile() {
             </div>
 
             <div>
-              <Label htmlFor="mediaType">Media Type *</Label>
+              <Label htmlFor="mediaType">Media Type <span className="text-red-500">*</span></Label>
               <Select value={mediaForm.mediaType} onValueChange={(value) => 
                 setMediaForm(prev => ({ ...prev, mediaType: value }))
               }>

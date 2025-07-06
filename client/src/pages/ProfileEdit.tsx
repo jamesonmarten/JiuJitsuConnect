@@ -55,13 +55,13 @@ export default function ProfileEdit() {
     mutationFn: async (profileData: any) => {
       if (userWithProfile?.profile) {
         // Update existing profile
-        return await apiRequest("PATCH", `/api/profiles/${user?.id}`, {
+        return await apiRequest("/api/profiles", "PUT", {
           ...profileData,
           userId: user?.id
         });
       } else {
         // Create new profile
-        return await apiRequest("POST", "/api/profiles", {
+        return await apiRequest("/api/profiles", "POST", {
           ...profileData,
           userId: user?.id
         });
@@ -97,6 +97,15 @@ export default function ProfileEdit() {
       toast({
         title: "Validation Error",
         description: "Please select your role",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.skillLevel) {
+      toast({
+        title: "Validation Error",
+        description: "Please select your skill level",
         variant: "destructive",
       });
       return;
@@ -156,7 +165,7 @@ export default function ProfileEdit() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Role */}
               <div className="space-y-2">
-                <Label htmlFor="role">Role *</Label>
+                <Label htmlFor="role">Role <span className="text-red-500">*</span></Label>
                 <Select value={formData.role} onValueChange={(value) => handleInputChange("role", value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select your role" />
@@ -170,7 +179,7 @@ export default function ProfileEdit() {
 
               {/* Skill Level */}
               <div className="space-y-2">
-                <Label htmlFor="skillLevel">Skill Level</Label>
+                <Label htmlFor="skillLevel">Skill Level <span className="text-red-500">*</span></Label>
                 <Select value={formData.skillLevel} onValueChange={(value) => handleInputChange("skillLevel", value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select your skill level" />
