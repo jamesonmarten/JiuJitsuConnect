@@ -25,12 +25,14 @@ export default function NotFound() {
                 Back to Home
               </Button>
             </Link>
-            <Link href="/explore">
-              <Button variant="outline" className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Find Fighters
-              </Button>
-            </Link>
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2"
+              onClick={() => window.location.href = '/api/login'}
+            >
+              <Users className="h-4 w-4" />
+              Login to Find Fighters
+            </Button>
           </div>
         </CardContent>
       </Card>

@@ -114,3 +114,5 @@ Preferred communication style: Simple, everyday language.
 
 Changelog:
 - July 04, 2025. Initial setup
+- July 06, 2025. Fixed form submission issues and added red asterisks to required fields throughout site
+- July 06, 2025. Fixed 404 page navigation for logged-out users
