@@ -120,3 +120,10 @@ Changelog:
 - July 07, 2025. Created comprehensive Elite Athlete's Guide with step-by-step documentation
 - July 07, 2025. Implemented Dev Cabin Technologies branding throughout application as "MMA Connect by DCT"
 - July 07, 2025. Updated target markets to Central Florida and Southeastern Wisconsin with expansion messaging
+- July 07, 2025. Fixed all instructor references to be generic experts instead of famous names for honest marketing
+- July 07, 2025. Resolved critical platform functionality issues:
+  * Fixed training sessions management - status updates (Confirm/Cancel) now work properly
+  * Fixed gym locator with fallback geocoding service for location searches without API keys
+  * Fixed media upload to properly handle YouTube URLs with automatic embed conversion
+  * Fixed profile edit form submission error caused by incorrect API request parameter order
+  * Added comprehensive YouTube URL validation with user-friendly error messages
