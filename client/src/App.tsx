@@ -17,6 +17,7 @@ import GymFinder from "@/pages/GymFinder";
 import Recommendations from "@/pages/Recommendations";
 import TrainingSessions from "@/pages/TrainingSessions";
 import UserGuide from "@/pages/UserGuide";
+import Lessons from "@/pages/Lessons";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -42,6 +43,7 @@ function Router() {
         <Switch>
           <Route path="/" component={Landing} />
           <Route path="/guide" component={UserGuide} />
+          <Route path="/lessons" component={Lessons} />
           <Route component={NotFound} />
         </Switch>
       </div>
@@ -64,6 +66,7 @@ function Router() {
           <Route path="/recommendations" component={Recommendations} />
           <Route path="/training-sessions" component={TrainingSessions} />
           <Route path="/guide" component={UserGuide} />
+          <Route path="/lessons" component={Lessons} />
           <Route component={NotFound} />
         </Switch>
       </main>

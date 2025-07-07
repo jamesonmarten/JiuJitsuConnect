@@ -15,6 +15,7 @@ export default function Navbar() {
     { href: "/recommendations", label: "AI Match" },
     { href: "/training-sessions", label: "Sessions" },
     { href: "/gym-finder", label: "Find Gyms" },
+    { href: "/lessons", label: "Free Lessons" },
     { href: "/my-profile", label: "My Profile" },
     { href: "/guide", label: "Guide" },
     { href: "/ratings", label: "Ratings" },

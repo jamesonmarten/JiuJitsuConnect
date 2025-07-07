@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Users, Star, MapPin, Camera, Book, Award, Zap, Target, Trophy, BookOpen } from "lucide-react";
+import { Users, Star, MapPin, Camera, Book, Award, Zap, Target, Trophy, BookOpen, Play } from "lucide-react";
 
 export default function Landing() {
   return (
@@ -63,6 +63,14 @@ export default function Landing() {
                 </Button>
                 <Button 
                   size="lg" 
+                  onClick={() => window.location.href = '/lessons'}
+                  className="bg-orange-500 text-white hover:bg-orange-600 border-none shadow-lg"
+                >
+                  <Play className="mr-2 h-5 w-5" />
+                  Free Lessons
+                </Button>
+                <Button 
+                  size="lg" 
                   variant="outline" 
                   onClick={() => window.location.href = '/api/login'}
                   className="border-2 border-white text-white hover:bg-white hover:text-blue-600 bg-transparent"
@@ -121,11 +129,61 @@ export default function Landing() {
         </div>
       </div>
 
+      {/* Free Lessons Promotion */}
+      <div className="py-20 bg-gradient-to-r from-orange-500 to-red-600 text-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4">
+              Learn from World Champions - Completely Free
+            </h2>
+            <p className="text-xl opacity-90 max-w-3xl mx-auto">
+              Get exclusive access to premium training content from legendary fighters like Marcelo Garcia, Daniel Cormier, and Saenchai. 
+              All lessons are completely free - no hidden fees, no subscriptions required.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <div className="text-center">
+              <div className="bg-white/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Play className="h-8 w-8" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">200+ Free Lessons</h3>
+              <p className="opacity-90">Complete techniques from beginner to advanced</p>
+            </div>
+            <div className="text-center">
+              <div className="bg-white/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Trophy className="h-8 w-8" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">World Champions</h3>
+              <p className="opacity-90">Learn from the best fighters in the world</p>
+            </div>
+            <div className="text-center">
+              <div className="bg-white/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Award className="h-8 w-8" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">HD Quality</h3>
+              <p className="opacity-90">Crystal clear video with multiple camera angles</p>
+            </div>
+          </div>
+          
+          <div className="text-center">
+            <Button 
+              size="lg" 
+              onClick={() => window.location.href = '/lessons'}
+              className="bg-white text-orange-600 hover:bg-gray-100 text-lg px-8 py-3"
+            >
+              <Play className="mr-2 h-5 w-5" />
+              Start Learning Now - Free
+            </Button>
+          </div>
+        </div>
+      </div>
+
       {/* Features Section */}
       <div className="container mx-auto px-4 py-20">
         <h2 className="text-3xl font-bold text-center mb-4">Forge Your Fighting Future</h2>
         <p className="text-center text-muted-foreground mb-12 text-lg">
-          Join the elite network of Orlando's most dedicated fighters and trainers
+          Join the elite network fighters and trainers across Central Florida & Southeastern Wisconsin
         </p>
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           <div className="text-center group hover:scale-105 transition-transform">
