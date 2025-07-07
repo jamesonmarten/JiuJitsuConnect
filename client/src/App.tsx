@@ -37,8 +37,10 @@ function Router() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-background">
-        <Route path="/" component={Landing} />
-        <Route component={NotFound} />
+        <Switch>
+          <Route path="/" component={Landing} />
+          <Route component={NotFound} />
+        </Switch>
       </div>
     );
   }
