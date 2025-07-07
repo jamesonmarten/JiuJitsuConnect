@@ -18,6 +18,7 @@ import Recommendations from "@/pages/Recommendations";
 import TrainingSessions from "@/pages/TrainingSessions";
 import UserGuide from "@/pages/UserGuide";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -48,9 +49,9 @@ function Router() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900 pt-16">
+      <main className="flex-1 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900 pt-16">
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/explore" component={Explore} />
@@ -66,6 +67,7 @@ function Router() {
           <Route component={NotFound} />
         </Switch>
       </main>
+      <Footer />
     </div>
   );
 }

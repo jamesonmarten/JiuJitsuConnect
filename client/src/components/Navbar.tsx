@@ -25,9 +25,12 @@ export default function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="navbar-brand flex items-center gap-2">
+          <Link href="/" className="navbar-brand flex items-center gap-3">
             <span className="text-xl">🥋</span>
-            Grapplr
+            <div className="flex flex-col">
+              <span className="font-bold text-lg">MMA Connect</span>
+              <span className="text-xs text-muted-foreground">by Dev Cabin Technologies</span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}

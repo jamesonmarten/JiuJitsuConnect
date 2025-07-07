@@ -9,6 +9,10 @@ export default function Landing() {
         <div className="container mx-auto px-4 py-24">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
+              <div className="mb-4">
+                <h2 className="text-2xl font-bold text-orange-300 mb-1">MMA Connect</h2>
+                <p className="text-lg text-orange-200">by Dev Cabin Technologies</p>
+              </div>
               <h1 className="text-4xl lg:text-6xl font-bold mb-6">
                 <span className="bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent">
                   Dominate the Mat
@@ -160,6 +164,90 @@ export default function Landing() {
           </div>
         </div>
       </div>
+
+      {/* Footer with Company Branding */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-3 gap-8">
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-2xl">🥋</span>
+                <div>
+                  <h3 className="font-bold text-xl">MMA Connect</h3>
+                  <p className="text-gray-400">by Dev Cabin Technologies</p>
+                </div>
+              </div>
+              <p className="text-gray-300 mb-4">
+                Connecting elite martial artists across Orlando and beyond. 
+                Professional-grade platform for serious fighters.
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold mb-4">Platform</h4>
+              <ul className="space-y-2 text-gray-300">
+                <li><a href="/guide" className="hover:text-orange-400 transition-colors">Elite Guide</a></li>
+                <li><a href="/api/login" className="hover:text-orange-400 transition-colors">Join Community</a></li>
+                <li><a href="#features" className="hover:text-orange-400 transition-colors">Features</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold mb-4">Dev Cabin Technologies</h4>
+              <ul className="space-y-2 text-gray-300">
+                <li>
+                  <a 
+                    href="https://devcabin.tech" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-orange-400 transition-colors"
+                  >
+                    Visit Our Website
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="https://devcabin.tech/portfolio" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-orange-400 transition-colors"
+                  >
+                    View Portfolio
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="https://devcabin.tech/contact" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-orange-400 transition-colors"
+                  >
+                    Contact Us
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+          <hr className="border-gray-700 my-8" />
+          
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <p className="text-gray-400 text-sm">
+              © 2025 Dev Cabin Technologies. All rights reserved.
+            </p>
+            <div className="flex gap-4 mt-4 md:mt-0">
+              <a 
+                href="https://devcabin.tech" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-orange-400 transition-colors text-sm"
+              >
+                Powered by DCT
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

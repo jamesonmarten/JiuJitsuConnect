@@ -24,9 +24,18 @@ export default function UserGuide() {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-          Elite Athlete's Guide to Grapplr
-        </h1>
+        <div className="mb-6">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <span className="text-2xl">🥋</span>
+            <div className="text-center">
+              <h2 className="text-xl font-bold text-orange-600">MMA Connect</h2>
+              <p className="text-sm text-muted-foreground">by Dev Cabin Technologies</p>
+            </div>
+          </div>
+          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+            Elite Athlete's Platform Guide
+          </h1>
+        </div>
         <p className="text-xl text-muted-foreground mb-2">
           Master the platform to maximize your martial arts journey
         </p>

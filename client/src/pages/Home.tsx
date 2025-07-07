@@ -86,12 +86,21 @@ export default function Home() {
     <div className="container mx-auto px-4 py-8">
       {/* Welcome Section */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          Welcome back, {user?.firstName || 'Fighter'}! 🥋
-        </h1>
-        <p className="text-xl text-muted-foreground">
-          Connect with the Jiu-Jitsu community in Longwood & Orlando
-        </p>
+        <div className="mb-4">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <span className="text-2xl">🥋</span>
+            <div className="text-center">
+              <h2 className="text-xl font-bold text-blue-600">MMA Connect</h2>
+              <p className="text-sm text-muted-foreground">by Dev Cabin Technologies</p>
+            </div>
+          </div>
+          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Welcome back, {user?.firstName || 'Fighter'}! 🥋
+          </h1>
+          <p className="text-xl text-muted-foreground">
+            Connect with the elite MMA community in Orlando & beyond
+          </p>
+        </div>
       </div>
 
       {/* Profile Setup Banner */}
