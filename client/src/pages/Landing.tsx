@@ -5,9 +5,14 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-neutral">
       {/* Hero Section */}
-      <div className="hero-section text-white">
-        <div className="container mx-auto px-4 py-24">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div className="relative min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIyIi8+PC9nPjwvZz48L3N2Zz4=')] repeat"></div>
+        </div>
+        
+        <div className="relative container mx-auto px-4 py-24 min-h-screen flex items-center">
+          <div className="grid lg:grid-cols-2 gap-16 items-center w-full">
             <div>
               <div className="mb-4">
                 <h2 className="text-2xl font-bold text-orange-300 mb-1">MMA Connect</h2>
@@ -22,10 +27,25 @@ export default function Landing() {
                   Connect. Train. Conquer.
                 </span>
               </h1>
-              <p className="text-xl mb-8 opacity-90">
+              <p className="text-xl mb-8 text-gray-200 leading-relaxed max-w-2xl">
                 The ultimate MMA and Jiu-Jitsu community platform for Orlando fighters. 
                 Find elite training partners, track your evolution, and forge your path to greatness.
               </p>
+              
+              <div className="flex items-center gap-6 mb-8">
+                <div className="flex items-center gap-2 text-orange-300">
+                  <Users className="h-5 w-5" />
+                  <span className="text-sm font-medium">2,000+ Athletes</span>
+                </div>
+                <div className="flex items-center gap-2 text-orange-300">
+                  <MapPin className="h-5 w-5" />
+                  <span className="text-sm font-medium">50+ Gyms</span>
+                </div>
+                <div className="flex items-center gap-2 text-orange-300">
+                  <Star className="h-5 w-5 fill-current" />
+                  <span className="text-sm font-medium">Elite Network</span>
+                </div>
+              </div>
               <div className="flex gap-4">
                 <Button 
                   size="lg" 
@@ -45,17 +65,49 @@ export default function Landing() {
                 </Button>
               </div>
             </div>
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-red-600/20 rounded-lg"></div>
-              <img 
-                src="https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&w=600&h=400&fit=crop" 
-                alt="MMA fighters sparring in octagon" 
-                className="rounded-lg shadow-2xl relative z-10"
-              />
-              <div className="absolute bottom-4 left-4 z-20">
-                <div className="bg-black/70 text-white px-3 py-1 rounded text-sm font-semibold">
-                  <Zap className="inline h-4 w-4 mr-1" />
-                  Elite Training Awaits
+            <div className="relative overflow-hidden rounded-xl">
+              <div className="relative h-96 bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+                <img 
+                  src="https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&w=800&h=600&fit=crop" 
+                  alt="Professional MMA training facility" 
+                  className="absolute inset-0 w-full h-full object-cover opacity-60"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                
+                {/* Professional Training Message */}
+                <div className="absolute inset-0 flex flex-col justify-center items-center text-center p-8">
+                  <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 max-w-md">
+                    <div className="flex items-center justify-center mb-4">
+                      <div className="bg-orange-500 rounded-full p-3">
+                        <Trophy className="h-8 w-8 text-white" />
+                      </div>
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-3">
+                      Professional Training Network
+                    </h3>
+                    <p className="text-white/90 mb-4">
+                      Connect with certified instructors, elite athletes, and serious practitioners in Orlando's premier martial arts community.
+                    </p>
+                    <div className="flex items-center justify-center gap-2 text-orange-300">
+                      <Star className="h-4 w-4 fill-current" />
+                      <span className="text-sm font-medium">Elite Network Access</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Professional Badges */}
+                <div className="absolute top-4 right-4">
+                  <div className="bg-orange-500/90 backdrop-blur-sm text-white px-3 py-2 rounded-lg text-sm font-semibold">
+                    <Award className="inline h-4 w-4 mr-1" />
+                    Verified Athletes Only
+                  </div>
+                </div>
+                
+                <div className="absolute bottom-4 left-4">
+                  <div className="bg-black/60 backdrop-blur-sm text-white px-3 py-2 rounded-lg text-sm">
+                    <MapPin className="inline h-4 w-4 mr-1" />
+                    Orlando & Central Florida
+                  </div>
                 </div>
               </div>
             </div>

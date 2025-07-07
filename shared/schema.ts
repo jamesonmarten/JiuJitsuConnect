@@ -145,6 +145,60 @@ export const follows = pgTable("follows", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Gym licenses and business features
+export const gymLicenses = pgTable("gym_licenses", {
+  id: serial("id").primaryKey(),
+  gymName: varchar("gym_name").notNull(),
+  contactEmail: varchar("contact_email").notNull(),
+  contactPhone: varchar("contact_phone"),
+  gymAddress: text("gym_address").notNull(),
+  city: varchar("city").notNull(),
+  state: varchar("state").notNull(),
+  zipCode: varchar("zip_code").notNull(),
+  website: varchar("website"),
+  gymType: varchar("gym_type").notNull(), // "bjj", "mma", "muay_thai", "boxing", "kickboxing"
+  licenseType: varchar("license_type").notNull().default("free"), // "free", "basic", "premium", "enterprise"
+  maxMembers: integer("max_members").notNull().default(10), // Free: 10, Basic: 50, Premium: 200, Enterprise: unlimited
+  currentMembers: integer("current_members").notNull().default(0),
+  monthlyPrice: decimal("monthly_price").default("0.00"),
+  yearlyPrice: decimal("yearly_price").default("0.00"),
+  billingStatus: varchar("billing_status").default("active"), // "active", "suspended", "cancelled"
+  trialEndDate: timestamp("trial_end_date"),
+  ownerId: varchar("owner_id").references(() => users.id),
+  isActive: boolean("is_active").default(true),
+  leadsSinceLastBilling: integer("leads_since_last_billing").default(0),
+  totalLeadsGenerated: integer("total_leads_generated").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Lead tracking for gyms
+export const gymLeads = pgTable("gym_leads", {
+  id: serial("id").primaryKey(),
+  gymLicenseId: integer("gym_license_id").notNull().references(() => gymLicenses.id),
+  prospectName: varchar("prospect_name").notNull(),
+  prospectEmail: varchar("prospect_email").notNull(),
+  prospectPhone: varchar("prospect_phone"),
+  prospectMessage: text("prospect_message"),
+  leadSource: varchar("lead_source").notNull(), // "gym_finder", "profile_view", "direct_contact"
+  leadStatus: varchar("lead_status").default("new"), // "new", "contacted", "converted", "closed"
+  followUpDate: timestamp("follow_up_date"),
+  notes: text("notes"),
+  estimatedValue: decimal("estimated_value"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Gym member connections (which users belong to which gym)
+export const gymMembers = pgTable("gym_members", {
+  id: serial("id").primaryKey(),
+  gymLicenseId: integer("gym_license_id").notNull().references(() => gymLicenses.id),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  membershipType: varchar("membership_type").default("member"), // "member", "instructor", "admin"
+  joinedAt: timestamp("joined_at").defaultNow(),
+  isActive: boolean("is_active").default(true),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ one, many }) => ({
   profile: one(profiles, {
@@ -295,6 +349,23 @@ export const insertFollowSchema = createInsertSchema(follows).omit({
   createdAt: true,
 });
 
+export const insertGymLicenseSchema = createInsertSchema(gymLicenses).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertGymLeadSchema = createInsertSchema(gymLeads).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertGymMemberSchema = createInsertSchema(gymMembers).omit({
+  id: true,
+  joinedAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -314,6 +385,12 @@ export type TrainingSession = typeof trainingSessions.$inferSelect;
 export type InsertTrainingSession = z.infer<typeof insertTrainingSessionSchema>;
 export type Follow = typeof follows.$inferSelect;
 export type InsertFollow = z.infer<typeof insertFollowSchema>;
+export type GymLicense = typeof gymLicenses.$inferSelect;
+export type InsertGymLicense = z.infer<typeof insertGymLicenseSchema>;
+export type GymLead = typeof gymLeads.$inferSelect;
+export type InsertGymLead = z.infer<typeof insertGymLeadSchema>;
+export type GymMember = typeof gymMembers.$inferSelect;
+export type InsertGymMember = z.infer<typeof insertGymMemberSchema>;
 
 // Combined user with profile type
 export type UserWithProfile = User & {
