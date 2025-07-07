@@ -362,9 +362,16 @@ export default function GymFinder() {
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-lg">{gym.name}</CardTitle>
-                    <div className="flex items-center gap-1">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="text-sm font-medium">{gym.rating.toFixed(1)}</span>
+                    <div className="flex flex-col items-end gap-1">
+                      <div className="flex items-center gap-1">
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        <span className="text-sm font-medium">{gym.rating.toFixed(1)}</span>
+                      </div>
+                      {(gym as any).status === 'contact_to_setup' && (
+                        <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                          Contact to Setup
+                        </Badge>
+                      )}
                     </div>
                   </div>
                 </CardHeader>
@@ -405,29 +412,57 @@ export default function GymFinder() {
                   </p>
                   
                   <div className="flex gap-2 pt-4 border-t">
-                    {gym.website && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => window.open(gym.website, "_blank")}
-                        className="flex-1"
-                      >
-                        <Globe className="h-4 w-4 mr-1" />
-                        Website
-                      </Button>
+                    {(gym as any).status === 'contact_to_setup' ? (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => window.open(gym.website, "_blank")}
+                          className="flex-1"
+                        >
+                          <Globe className="h-4 w-4 mr-1" />
+                          Visit Website
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            const subject = encodeURIComponent(`MMA Connect Partnership - ${gym.name}`);
+                            const body = encodeURIComponent(`Hi ${gym.name} team,\n\nI'm interested in setting up your gym on the MMA Connect platform to help connect with martial arts practitioners in our community.\n\nPlease contact us to discuss partnership opportunities.\n\nBest regards`);
+                            window.open(`mailto:${gym.phone ? gym.phone : 'info@mmaconnect.com'}?subject=${subject}&body=${body}`, "_blank");
+                          }}
+                          className="flex-1"
+                        >
+                          <Users className="h-4 w-4 mr-1" />
+                          Contact to Setup
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        {gym.website && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => window.open(gym.website, "_blank")}
+                            className="flex-1"
+                          >
+                            <Globe className="h-4 w-4 mr-1" />
+                            Website
+                          </Button>
+                        )}
+                        
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            const query = encodeURIComponent(gym.address);
+                            window.open(`https://maps.google.com/maps?q=${query}`, "_blank");
+                          }}
+                          className="flex-1"
+                        >
+                          <MapPin className="h-4 w-4 mr-1" />
+                          Directions
+                        </Button>
+                      </>
                     )}
-                    
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        const query = encodeURIComponent(gym.address);
-                        window.open(`https://maps.google.com/maps?q=${query}`, "_blank");
-                      }}
-                      className="flex-1"
-                    >
-                      <MapPin className="h-4 w-4 mr-1" />
-                      Directions
-                    </Button>
                   </div>
                 </CardContent>
               </Card>
