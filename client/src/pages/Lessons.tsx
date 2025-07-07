@@ -30,12 +30,12 @@ const lessons: Lesson[] = [
     difficulty: "Beginner",
     category: "BJJ",
     description: "Learn the essential closed guard techniques from 5x World Champion Bernardo Faria. Master the foundations that every BJJ practitioner needs.",
-    thumbnail: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&h=400",
+    thumbnail: "https://img.youtube.com/vi/RYn7Th3aGgw/maxresdefault.jpg",
     rating: 4.9,
     views: 15420,
     isFree: true,
     tags: ["Guard", "Fundamentals", "Closed Guard"],
-    videoUrl: "https://www.youtube.com/embed/U7VoDcB1Go0"
+    videoUrl: "https://www.youtube.com/embed/RYn7Th3aGgw"
   },
   {
     id: "2",
@@ -45,12 +45,12 @@ const lessons: Lesson[] = [
     difficulty: "Intermediate",
     category: "MMA",
     description: "GSP's coach demonstrates proper sprawl technique for MMA takedown defense. Essential skills for any fighter.",
-    thumbnail: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&h=400",
+    thumbnail: "https://img.youtube.com/vi/UB6nHgi_1uo/maxresdefault.jpg",
     rating: 4.8,
     views: 23150,
     isFree: true,
     tags: ["Takedown Defense", "Wrestling", "MMA"],
-    videoUrl: "https://www.youtube.com/embed/WGqPO1jKpY8"
+    videoUrl: "https://www.youtube.com/embed/UB6nHgi_1uo"
   },
   {
     id: "3",
@@ -60,12 +60,12 @@ const lessons: Lesson[] = [
     difficulty: "Advanced",
     category: "Muay Thai",
     description: "Advanced clinch control techniques from one of the most experienced western Muay Thai fighters training in Thailand.",
-    thumbnail: "https://images.unsplash.com/photo-1555597408-b57c073c3c2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&h=400",
+    thumbnail: "https://img.youtube.com/vi/GohqyCbrt1U/maxresdefault.jpg",
     rating: 4.9,
     views: 18900,
     isFree: true,
     tags: ["Clinch", "Muay Thai", "Control"],
-    videoUrl: "https://www.youtube.com/embed/dCiN7SOyzhU"
+    videoUrl: "https://www.youtube.com/embed/GohqyCbrt1U"
   },
   {
     id: "4",
@@ -75,12 +75,12 @@ const lessons: Lesson[] = [
     difficulty: "Beginner",
     category: "Boxing",
     description: "Master fundamental boxing footwork patterns. Learn how to move efficiently and maintain balance while striking.",
-    thumbnail: "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&h=400",
+    thumbnail: "https://img.youtube.com/vi/DD9w2ZDdGN4/maxresdefault.jpg",
     rating: 4.7,
     views: 31200,
     isFree: true,
     tags: ["Footwork", "Boxing", "Movement"],
-    videoUrl: "https://www.youtube.com/embed/TQNNhEaQKD8"
+    videoUrl: "https://www.youtube.com/embed/DD9w2ZDdGN4"
   },
   {
     id: "5",
@@ -90,12 +90,12 @@ const lessons: Lesson[] = [
     difficulty: "Advanced",
     category: "BJJ",
     description: "High-level armbar techniques from the guard position. Learn setups, grips, and finishing details.",
-    thumbnail: "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&h=400",
+    thumbnail: "https://img.youtube.com/vi/2oVHEcyJhIM/maxresdefault.jpg",
     rating: 4.9,
     views: 12800,
     isFree: true,
     tags: ["Submissions", "Armbar", "Guard"],
-    videoUrl: "https://www.youtube.com/embed/pe_yqleGjQE"
+    videoUrl: "https://www.youtube.com/embed/2oVHEcyJhIM"
   },
   {
     id: "6",
@@ -105,12 +105,12 @@ const lessons: Lesson[] = [
     difficulty: "Intermediate",
     category: "Wrestling",
     description: "Perfect your double leg takedown technique with proper setup, penetration, and finish from top wrestling coaches.",
-    thumbnail: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&h=400",
+    thumbnail: "https://img.youtube.com/vi/4DHzLvLd-0Y/maxresdefault.jpg",
     rating: 4.8,
     views: 19450,
     isFree: true,
     tags: ["Wrestling", "Takedowns", "Double Leg"],
-    videoUrl: "https://www.youtube.com/embed/5nT4tjHhE3w"
+    videoUrl: "https://www.youtube.com/embed/4DHzLvLd-0Y"
   },
   {
     id: "7",
@@ -120,12 +120,12 @@ const lessons: Lesson[] = [
     difficulty: "Beginner",
     category: "Boxing",
     description: "Learn the most fundamental boxing combination. Proper form, timing, and power generation for the 1-2 combo.",
-    thumbnail: "https://images.unsplash.com/photo-1594736797933-d0d83c7e6fad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&h=400",
+    thumbnail: "https://img.youtube.com/vi/uGL7eEjEQrA/maxresdefault.jpg",
     rating: 4.6,
     views: 42300,
     isFree: true,
     tags: ["Boxing", "Combinations", "Jab"],
-    videoUrl: "https://www.youtube.com/embed/8qQ0W0Ajw4M"
+    videoUrl: "https://www.youtube.com/embed/uGL7eEjEQrA"
   },
   {
     id: "8",
@@ -135,12 +135,12 @@ const lessons: Lesson[] = [
     difficulty: "Intermediate",
     category: "BJJ",
     description: "Master the triangle choke from multiple positions. Learn the mechanics and troubleshooting for this essential submission.",
-    thumbnail: "https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&h=400",
+    thumbnail: "https://img.youtube.com/vi/CEPp45IenVw/maxresdefault.jpg",
     rating: 4.8,
     views: 16750,
     isFree: true,
     tags: ["Triangle", "Submissions", "BJJ"],
-    videoUrl: "https://www.youtube.com/embed/lsYgYA7CqxM"
+    videoUrl: "https://www.youtube.com/embed/CEPp45IenVw"
   },
   {
     id: "9",
@@ -150,12 +150,12 @@ const lessons: Lesson[] = [
     difficulty: "Intermediate",
     category: "Muay Thai",
     description: "Develop powerful and technical kicks. Learn proper hip rotation, timing, and target selection for effective striking.",
-    thumbnail: "https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&h=400",
+    thumbnail: "https://img.youtube.com/vi/D_RMpYozXwU/maxresdefault.jpg",
     rating: 4.7,
     views: 28900,
     isFree: true,
     tags: ["Kicks", "Muay Thai", "Technique"],
-    videoUrl: "https://www.youtube.com/embed/Zt_Q4aqwW5M"
+    videoUrl: "https://www.youtube.com/embed/D_RMpYozXwU"
   },
   {
     id: "10",
@@ -165,7 +165,7 @@ const lessons: Lesson[] = [
     difficulty: "Advanced",
     category: "BJJ",
     description: "Learn fundamental concepts of ground control from one of the most respected BJJ instructors in the world.",
-    thumbnail: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&h=400",
+    thumbnail: "https://img.youtube.com/vi/BWitv9AKoNU/maxresdefault.jpg",
     rating: 4.9,
     views: 8900,
     isFree: true,
