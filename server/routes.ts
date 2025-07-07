@@ -776,12 +776,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
       }).filter((gym: any) => gym.lat && gym.lng);
       
-      // Get curated gyms first (instant response) - prioritize quality over external API speed
+      // Try Google Places API first for real gym data
+      let gyms: any[] = [];
+      
+      try {
+        const googleApiKey = process.env.GOOGLE_PLACES_API_KEY;
+        if (googleApiKey) {
+          // Search for martial arts gyms using Google Places
+          const googleResponse = await fetch(
+            `https://maps.googleapis.com/maps/api/place/nearbysearch/json?` +
+            `location=${searchLat},${searchLng}&` +
+            `radius=${radiusMeters}&` +
+            `type=gym&` +
+            `keyword=martial arts bjj jiu jitsu mma karate boxing&` +
+            `key=${googleApiKey}`
+          );
+          
+          if (googleResponse.ok) {
+            const googleData = await googleResponse.json();
+            
+            if (googleData.results) {
+              gyms = googleData.results.map((place: any) => {
+                const distance = calculateDistance(
+                  searchLat, 
+                  searchLng, 
+                  place.geometry.location.lat, 
+                  place.geometry.location.lng
+                );
+                
+                return {
+                  id: place.place_id,
+                  name: place.name,
+                  address: place.vicinity || place.formatted_address || "Address not available",
+                  phone: place.formatted_phone_number || "",
+                  website: place.website || "",
+                  rating: place.rating || 4.0,
+                  distance: `${distance.toFixed(1)} miles`,
+                  hours: place.opening_hours?.open_now ? "Open now" : "Check hours",
+                  specialties: extractSpecialtiesFromName(place.name, place.types || []),
+                  description: `${place.name} - Professional martial arts training facility.`,
+                  priceRange: place.price_level ? "$".repeat(place.price_level) : "$$",
+                  lat: place.geometry.location.lat,
+                  lng: place.geometry.location.lng,
+                  photo: place.photos?.[0]?.photo_reference || null,
+                  isGoogleResult: true
+                };
+              }).filter((gym: any) => 
+                gym.name.toLowerCase().includes('martial') ||
+                gym.name.toLowerCase().includes('bjj') ||
+                gym.name.toLowerCase().includes('jiu') ||
+                gym.name.toLowerCase().includes('mma') ||
+                gym.name.toLowerCase().includes('karate') ||
+                gym.name.toLowerCase().includes('boxing') ||
+                gym.name.toLowerCase().includes('taekwondo')
+              );
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Google Places API failed:", error);
+      }
+      
+      // Get curated/featured gyms
       const curatedGyms = getCuratedGyms(searchLat, searchLng, address as string);
       
-      // Return curated gyms immediately - they're high quality and fast
-      curatedGyms.sort((a: any, b: any) => parseFloat(a.distance) - parseFloat(b.distance));
-      res.json(curatedGyms);
+      // Combine results - prioritize featured gyms
+      const allGyms = [...curatedGyms, ...gyms];
+      const uniqueGyms = allGyms.filter((gym, index, self) => 
+        index === self.findIndex(g => 
+          g.name.toLowerCase() === gym.name.toLowerCase() || 
+          g.address === gym.address
+        )
+      );
+      
+      // Sort by featured status first, then distance
+      uniqueGyms.sort((a: any, b: any) => {
+        // Featured gyms (curated) first
+        if (!a.isGoogleResult && b.isGoogleResult) return -1;
+        if (a.isGoogleResult && !b.isGoogleResult) return 1;
+        // Then sort by distance
+        return parseFloat(a.distance) - parseFloat(b.distance);
+      });
+      
+      res.json(uniqueGyms);
     } catch (error) {
       console.error("Error searching gyms:", error);
       res.status(500).json({ message: "Failed to search gyms" });
@@ -1048,11 +1125,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
 
-    // Calculate actual distances for relevant gyms
+    // Calculate actual distances for relevant gyms and mark as featured
     return relevantGyms.map(gym => ({
       ...gym,
-      distance: `${calculateDistance(searchLat, searchLng, gym.lat, gym.lng).toFixed(1)} miles`
+      distance: `${calculateDistance(searchLat, searchLng, gym.lat, gym.lng).toFixed(1)} miles`,
+      isFeatured: true,
+      isGoogleResult: false
     }));
+  }
+
+  function extractSpecialtiesFromName(name: string, types: string[]): string[] {
+    const specialties = [];
+    const lowerName = name.toLowerCase();
+    
+    if (lowerName.includes('bjj') || lowerName.includes('jiu jitsu') || lowerName.includes('jiu-jitsu')) {
+      specialties.push('Brazilian Jiu-Jitsu');
+    }
+    if (lowerName.includes('mma') || lowerName.includes('mixed martial')) {
+      specialties.push('MMA');
+    }
+    if (lowerName.includes('karate')) {
+      specialties.push('Karate');
+    }
+    if (lowerName.includes('boxing')) {
+      specialties.push('Boxing');
+    }
+    if (lowerName.includes('muay thai')) {
+      specialties.push('Muay Thai');
+    }
+    if (lowerName.includes('kickboxing')) {
+      specialties.push('Kickboxing');
+    }
+    if (lowerName.includes('taekwondo')) {
+      specialties.push('Taekwondo');
+    }
+    if (lowerName.includes('wrestling')) {
+      specialties.push('Wrestling');
+    }
+    
+    if (specialties.length === 0) {
+      specialties.push('Martial Arts');
+    }
+    
+    return specialties;
   }
 
   function extractSpecialties(name: string, sport: string): string[] {

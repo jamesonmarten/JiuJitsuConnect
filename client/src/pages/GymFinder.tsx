@@ -371,6 +371,11 @@ export default function GymFinder() {
                           Contact to Setup
                         </Badge>
                       )}
+                      {(gym as any).isFeatured && (
+                        <Badge variant="default" className="text-xs bg-green-600 text-white">
+                          Featured
+                        </Badge>
+                      )}
                     </div>
                   </div>
                 </CardHeader>
