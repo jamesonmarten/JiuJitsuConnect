@@ -776,10 +776,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
       }).filter((gym: any) => gym.lat && gym.lng);
       
-      // Sort by distance
-      gyms.sort((a: any, b: any) => parseFloat(a.distance) - parseFloat(b.distance));
+      // Add curated top gyms for each region
+      const curatedGyms = getCuratedGyms(searchLat, searchLng, address as string);
       
-      res.json(gyms);
+      // Combine and deduplicate gyms
+      const allGyms = [...curatedGyms, ...gyms];
+      const uniqueGyms = allGyms.filter((gym, index, self) => 
+        index === self.findIndex(g => g.name === gym.name || g.address === gym.address)
+      );
+      
+      // Sort by distance
+      uniqueGyms.sort((a: any, b: any) => parseFloat(a.distance) - parseFloat(b.distance));
+      
+      res.json(uniqueGyms);
     } catch (error) {
       console.error("Error searching gyms:", error);
       res.status(500).json({ message: "Failed to search gyms" });
@@ -806,6 +815,129 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (tags['addr:postcode']) parts.push(tags['addr:postcode']);
     
     return parts.length > 0 ? parts.join(' ') : "Address not available";
+  }
+
+  function getCuratedGyms(searchLat: number, searchLng: number, searchAddress: string): any[] {
+    const curatedGyms = [
+      // Orlando/Longwood Area - Central Florida
+      {
+        id: "elevate-bjj-longwood",
+        name: "Elevate Brazilian Jiu-Jitsu",
+        address: "1780 W State Rd 434, Longwood, FL 32750",
+        phone: "(407) 862-8192",
+        website: "https://elevate-bjj.com/",
+        rating: 4.9,
+        distance: "0.0",
+        hours: "Mon-Fri 6AM-10PM, Sat-Sun 9AM-2PM",
+        specialties: ["Brazilian Jiu-Jitsu", "MMA", "Self Defense", "Kids Classes"],
+        description: "Premier Brazilian Jiu-Jitsu academy in Longwood. Expert instruction for all skill levels from beginner to competition teams.",
+        priceRange: "$$",
+        lat: 28.7041,
+        lng: -81.3384,
+        region: "orlando"
+      },
+      {
+        id: "american-top-team-orlando",
+        name: "American Top Team Orlando",
+        address: "5601 Major Blvd, Orlando, FL 32819",
+        phone: "(407) 930-5600",
+        website: "https://americantopteamorlando.com/",
+        rating: 4.8,
+        distance: "0.0",
+        hours: "Mon-Fri 6AM-9PM, Sat 9AM-1PM",
+        specialties: ["MMA", "Brazilian Jiu-Jitsu", "Muay Thai", "Boxing"],
+        description: "World-class MMA training facility with championship-level coaching and professional fighter development programs.",
+        priceRange: "$$",
+        lat: 28.4707,
+        lng: -81.4390,
+        region: "orlando"
+      },
+      {
+        id: "gracie-barra-orlando",
+        name: "Gracie Barra Orlando",
+        address: "7514 Dr Phillips Blvd, Orlando, FL 32819",
+        phone: "(407) 352-8488",
+        website: "https://gbaorlando.com/",
+        rating: 4.7,
+        distance: "0.0",
+        hours: "Mon-Fri 6AM-9PM, Sat 10AM-1PM",
+        specialties: ["Brazilian Jiu-Jitsu", "Self Defense", "Kids BJJ"],
+        description: "Part of the world's largest Brazilian Jiu-Jitsu organization. Traditional Gracie Barra methodology and curriculum.",
+        priceRange: "$$",
+        lat: 28.4502,
+        lng: -81.4786,
+        region: "orlando"
+      },
+      // Tampa Area
+      {
+        id: "gracie-tampa-south",
+        name: "Gracie Tampa South",
+        address: "4401 W Kennedy Blvd, Tampa, FL 33609",
+        phone: "(813) 289-3500",
+        website: "https://gracietampasouth.com/",
+        rating: 4.8,
+        distance: "0.0",
+        hours: "Mon-Fri 6AM-9PM, Sat 9AM-12PM",
+        specialties: ["Brazilian Jiu-Jitsu", "MMA", "Muay Thai"],
+        description: "Elite Brazilian Jiu-Jitsu academy with world-champion instructors and comprehensive martial arts programs.",
+        priceRange: "$$",
+        lat: 27.9506,
+        lng: -82.5370,
+        region: "tampa"
+      },
+      // Milwaukee/Wisconsin Area
+      {
+        id: "roufusport-milwaukee",
+        name: "Roufusport",
+        address: "1717 W Canal St, Milwaukee, WI 53233",
+        phone: "(414) 342-4772",
+        website: "https://roufusport.com/",
+        rating: 4.9,
+        distance: "0.0",
+        hours: "Mon-Fri 6AM-9PM, Sat 10AM-2PM",
+        specialties: ["MMA", "Muay Thai", "Brazilian Jiu-Jitsu", "Boxing"],
+        description: "Premier MMA gym producing UFC champions. Home to elite fighters and comprehensive martial arts training programs.",
+        priceRange: "$$$",
+        lat: 43.0389,
+        lng: -87.9365,
+        region: "milwaukee"
+      },
+      {
+        id: "milwaukee-jiu-jitsu",
+        name: "Milwaukee Jiu-Jitsu Academy",
+        address: "2018 S 1st St, Milwaukee, WI 53207",
+        phone: "(414) 482-7465",
+        website: "https://milwaukeejiujitsu.com/",
+        rating: 4.7,
+        distance: "0.0",
+        hours: "Mon-Fri 6AM-9PM, Sat 10AM-1PM",
+        specialties: ["Brazilian Jiu-Jitsu", "Wrestling", "Self Defense"],
+        description: "Traditional Brazilian Jiu-Jitsu academy focused on technique, discipline, and personal development.",
+        priceRange: "$$",
+        lat: 43.0389,
+        lng: -87.9073,
+        region: "milwaukee"
+      }
+    ];
+
+    // Determine which region we're searching in
+    let relevantGyms = curatedGyms;
+    if (searchAddress) {
+      const addressLower = searchAddress.toLowerCase();
+      if (addressLower.includes('orlando') || addressLower.includes('longwood') || addressLower.includes('florida') || addressLower.includes('fl')) {
+        relevantGyms = curatedGyms.filter(gym => gym.region === 'orlando' || gym.region === 'tampa');
+      } else if (addressLower.includes('milwaukee') || addressLower.includes('wisconsin') || addressLower.includes('wi')) {
+        relevantGyms = curatedGyms.filter(gym => gym.region === 'milwaukee');
+      } else if (addressLower.includes('tampa')) {
+        relevantGyms = curatedGyms.filter(gym => gym.region === 'tampa');
+      }
+    }
+
+    // Calculate actual distances for relevant gyms
+    return relevantGyms.map(gym => ({
+      ...gym,
+      distance: `${calculateDistance(searchLat, searchLng, gym.lat, gym.lng).toFixed(1)} miles`
+    }));
   }
 
   function extractSpecialties(name: string, sport: string): string[] {
