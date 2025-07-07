@@ -776,19 +776,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
       }).filter((gym: any) => gym.lat && gym.lng);
       
-      // Add curated top gyms for each region
+      // Get curated gyms first (instant response) - prioritize quality over external API speed
       const curatedGyms = getCuratedGyms(searchLat, searchLng, address as string);
       
-      // Combine and deduplicate gyms
-      const allGyms = [...curatedGyms, ...gyms];
-      const uniqueGyms = allGyms.filter((gym, index, self) => 
-        index === self.findIndex(g => g.name === gym.name || g.address === gym.address)
-      );
-      
-      // Sort by distance
-      uniqueGyms.sort((a: any, b: any) => parseFloat(a.distance) - parseFloat(b.distance));
-      
-      res.json(uniqueGyms);
+      // Return curated gyms immediately - they're high quality and fast
+      curatedGyms.sort((a: any, b: any) => parseFloat(a.distance) - parseFloat(b.distance));
+      res.json(curatedGyms);
     } catch (error) {
       console.error("Error searching gyms:", error);
       res.status(500).json({ message: "Failed to search gyms" });

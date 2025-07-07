@@ -119,6 +119,20 @@
     @apply cursor-pointer text-2xl text-muted-foreground transition-colors duration-200 hover:text-accent;
   }
 
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
   .rating-interactive.active {
     @apply text-accent;
   }

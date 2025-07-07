@@ -309,22 +309,21 @@ export default function GymFinder() {
           </p>
         </Card>
       ) : isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                  <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-                  <div className="flex gap-2">
-                    <div className="h-6 bg-gray-200 rounded w-16"></div>
-                    <div className="h-6 bg-gray-200 rounded w-16"></div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        <div className="flex flex-col items-center justify-center py-16 space-y-4">
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Search className="h-6 w-6 text-blue-600" />
+            </div>
+          </div>
+          <div className="text-center">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              Searching Gyms...
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+              Finding the best martial arts facilities in your area
+            </p>
+          </div>
         </div>
       ) : error ? (
         <Card className="p-12 text-center">
@@ -358,7 +357,7 @@ export default function GymFinder() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {gyms.map((gym) => (
-              <Card key={gym.id} className="hover:shadow-lg transition-shadow">
+              <Card key={gym.id} className="hover:shadow-lg transition-shadow h-fit">
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-lg">{gym.name}</CardTitle>
@@ -376,38 +375,43 @@ export default function GymFinder() {
                   </div>
                 </CardHeader>
                 
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                    <MapPin className="h-4 w-4" />
-                    {gym.address}
+                <CardContent className="space-y-3">
+                  <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300">
+                    <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                    <span className="line-clamp-2 break-words">{gym.address}</span>
                   </div>
                   
                   <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                    <Navigation className="h-4 w-4" />
-                    {gym.distance}
+                    <Navigation className="h-4 w-4 flex-shrink-0" />
+                    <span>{gym.distance}</span>
                   </div>
                   
                   {gym.phone && (
                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                      <Phone className="h-4 w-4" />
-                      {gym.phone}
+                      <Phone className="h-4 w-4 flex-shrink-0" />
+                      <span className="break-all">{gym.phone}</span>
                     </div>
                   )}
                   
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                    <Clock className="h-4 w-4" />
-                    {gym.hours}
+                  <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300">
+                    <Clock className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                    <span className="line-clamp-2 break-words">{gym.hours}</span>
                   </div>
                   
                   <div className="flex flex-wrap gap-1">
-                    {gym.specialties.map((specialty, index) => (
+                    {gym.specialties.slice(0, 4).map((specialty, index) => (
                       <Badge key={index} variant="secondary" className="text-xs">
                         {specialty}
                       </Badge>
                     ))}
+                    {gym.specialties.length > 4 && (
+                      <Badge variant="outline" className="text-xs">
+                        +{gym.specialties.length - 4} more
+                      </Badge>
+                    )}
                   </div>
                   
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3">
                     {gym.description}
                   </p>
                   
