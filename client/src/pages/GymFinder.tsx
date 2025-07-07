@@ -45,18 +45,27 @@ export default function GymFinder() {
   const [isGettingLocation, setIsGettingLocation] = useState(false);
 
   // Get user's current location
+  const presetLocations = [
+    { name: "Orlando, FL", address: "Orlando, FL" },
+    { name: "Tampa, FL", address: "Tampa, FL" },
+    { name: "Jacksonville, FL", address: "Jacksonville, FL" },
+    { name: "Miami, FL", address: "Miami, FL" },
+    { name: "Milwaukee, WI", address: "Milwaukee, WI" },
+    { name: "Madison, WI", address: "Madison, WI" },
+    { name: "Green Bay, WI", address: "Green Bay, WI" },
+  ];
+
   const getCurrentLocation = () => {
     setIsGettingLocation(true);
     setLocation(prev => ({ ...prev, locationError: null }));
 
     if (!navigator.geolocation) {
-      const error = "Geolocation is not supported by this browser";
+      const error = "Geolocation is not supported by this browser. Please select a city or enter an address.";
       setLocation(prev => ({ ...prev, locationError: error }));
       setIsGettingLocation(false);
       toast({
-        title: "Location Error",
-        description: error,
-        variant: "destructive",
+        title: "Location Access",
+        description: "Please select a city from the dropdown or enter an address manually.",
       });
       return;
     }
@@ -209,31 +218,66 @@ export default function GymFinder() {
               </div>
               
               {location.locationError && (
-                <p className="text-sm text-red-600 dark:text-red-400 mt-2">
-                  {location.locationError}
-                </p>
+                <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                    {location.locationError}
+                  </p>
+                  <p className="text-xs text-blue-600 dark:text-blue-300 mt-1">
+                    Try selecting a city from the dropdown below or entering your address manually.
+                  </p>
+                </div>
               )}
             </div>
           </div>
 
           <div className="border-t pt-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">Quick Location Select:</label>
+                <Select value="" onValueChange={(value) => {
+                  const preset = presetLocations.find(p => p.address === value);
+                  if (preset) {
+                    setLocation(prev => ({ 
+                      ...prev, 
+                      address: preset.address,
+                      lat: null,
+                      lng: null,
+                      isUsingGeolocation: false,
+                      locationError: null
+                    }));
+                  }
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a city..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {presetLocations.map((loc) => (
+                      <SelectItem key={loc.address} value={loc.address}>
+                        {loc.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-2 block">Or Enter Address:</label>
                 <Input
-                  placeholder="Or enter zip code / address manually..."
+                  placeholder="Zip code, city, or address..."
                   value={location.address}
                   onChange={(e) => setLocation(prev => ({ ...prev, address: e.target.value }))}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddressSearch()}
                 />
               </div>
-              <Button 
-                onClick={handleAddressSearch}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <Search className="h-4 w-4" />
-                Search Address
-              </Button>
+              <div className="flex items-end">
+                <Button 
+                  onClick={handleAddressSearch}
+                  disabled={!location.address.trim()}
+                  className="w-full flex items-center gap-2"
+                >
+                  <Search className="h-4 w-4" />
+                  Search Gyms
+                </Button>
+              </div>
             </div>
           </div>
 

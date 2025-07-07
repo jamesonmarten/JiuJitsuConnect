@@ -298,7 +298,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body,
         mediaUrl,
         userId,
-        techniques: req.body.techniques ? req.body.techniques.split(',').map((t: string) => t.trim()) : [],
+        techniques: typeof req.body.techniques === 'string' && req.body.techniques 
+          ? req.body.techniques.split(',').map((t: string) => t.trim()).filter(t => t.length > 0)
+          : Array.isArray(req.body.techniques) 
+            ? req.body.techniques 
+            : [],
       });
       
       const media = await storage.createTrainingMedia(mediaData);
