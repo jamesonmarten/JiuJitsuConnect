@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Play, Clock, Star, Users, BookOpen, Award, Target, Shield } from "lucide-react";
+import { Play, Clock, Star, Users, BookOpen, Award, Target, Shield, ArrowLeft, Home, Search } from "lucide-react";
+import { Link } from "wouter";
 
 interface Lesson {
   id: string;
@@ -193,6 +194,25 @@ export default function Lessons() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Navigation Breadcrumb */}
+      <div className="bg-white border-b border-gray-200 py-3">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center gap-4">
+            <Link href="/" className="flex items-center gap-2 text-gray-600 hover:text-orange-600 transition-colors">
+              <Home className="h-4 w-4" />
+              <span className="text-sm">Home</span>
+            </Link>
+            <span className="text-gray-400">/</span>
+            <Link href="/explore" className="flex items-center gap-2 text-gray-600 hover:text-orange-600 transition-colors">
+              <Search className="h-4 w-4" />
+              <span className="text-sm">Explore</span>
+            </Link>
+            <span className="text-gray-400">/</span>
+            <span className="text-sm text-orange-600 font-medium">Free Lessons</span>
+          </div>
+        </div>
+      </div>
+
       {/* Header */}
       <div className="bg-gradient-to-r from-orange-500 to-red-600 text-white py-16">
         <div className="container mx-auto px-4">
@@ -272,7 +292,7 @@ export default function Lessons() {
           <TabsContent value="all" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredLessons.map((lesson) => (
-                <Card key={lesson.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+                <Card key={lesson.id} className="lesson-card hover:shadow-lg transition-shadow cursor-pointer">
                   <div className="relative">
                     <img 
                       src={lesson.thumbnail} 
@@ -366,7 +386,16 @@ export default function Lessons() {
             <p className="text-xl mb-6 opacity-90">
               Join hundreds of fighters already learning from elite instructors
             </p>
-            <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100">
+            <Button 
+              size="lg" 
+              className="bg-white text-orange-600 hover:bg-gray-100"
+              onClick={() => {
+                const firstLesson = document.querySelector('.lesson-card');
+                if (firstLesson) {
+                  firstLesson.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+            >
               Start Your Free Training Now
             </Button>
           </div>
