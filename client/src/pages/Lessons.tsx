@@ -24,93 +24,153 @@ interface Lesson {
 const lessons: Lesson[] = [
   {
     id: "1",
-    title: "Fundamental Guard Positions",
-    instructor: "Marcelo Garcia",
+    title: "Closed Guard Fundamentals",
+    instructor: "Bernardo Faria",
     duration: "12:45",
     difficulty: "Beginner",
     category: "BJJ",
-    description: "Master the basic guard positions that form the foundation of your ground game. Learn proper posture, grips, and transitions.",
-    thumbnail: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop",
+    description: "Learn the essential closed guard techniques from 5x World Champion Bernardo Faria. Master the foundations that every BJJ practitioner needs.",
+    thumbnail: "https://img.youtube.com/vi/U7VoDcB1Go0/maxresdefault.jpg",
     rating: 4.9,
     views: 15420,
     isFree: true,
-    tags: ["Guard", "Fundamentals", "Posture"],
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    tags: ["Guard", "Fundamentals", "Closed Guard"],
+    videoUrl: "https://www.youtube.com/embed/U7VoDcB1Go0"
   },
   {
     id: "2",
-    title: "Takedown Defense Essentials",
-    instructor: "Daniel Cormier",
+    title: "Sprawl Defense Technique",
+    instructor: "Firas Zahabi",
     duration: "18:32",
     difficulty: "Intermediate",
     category: "MMA",
-    description: "Learn crucial takedown defense techniques used at the highest level of MMA competition.",
-    thumbnail: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=400&h=300&fit=crop",
+    description: "GSP's coach demonstrates proper sprawl technique for MMA takedown defense. Essential skills for any fighter.",
+    thumbnail: "https://img.youtube.com/vi/WGqPO1jKpY8/maxresdefault.jpg",
     rating: 4.8,
     views: 23150,
     isFree: true,
     tags: ["Takedown Defense", "Wrestling", "MMA"],
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    videoUrl: "https://www.youtube.com/embed/WGqPO1jKpY8"
   },
   {
     id: "3",
-    title: "Thai Clinch Mastery",
-    instructor: "Saenchai PKSaenchaimuaythaigym",
+    title: "Thai Clinch Control",
+    instructor: "Sylvie von Duuglas-Ittu",
     duration: "15:20",
     difficulty: "Advanced",
     category: "Muay Thai",
-    description: "Advanced clinch techniques from Thailand's legendary fighter. Control, knees, and dominance.",
-    thumbnail: "https://images.unsplash.com/photo-1555597408-b57c073c3c2d?w=400&h=300&fit=crop",
+    description: "Advanced clinch control techniques from one of the most experienced western Muay Thai fighters training in Thailand.",
+    thumbnail: "https://img.youtube.com/vi/dCiN7SOyzhU/maxresdefault.jpg",
     rating: 4.9,
     views: 18900,
     isFree: true,
-    tags: ["Clinch", "Muay Thai", "Advanced"],
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    tags: ["Clinch", "Muay Thai", "Control"],
+    videoUrl: "https://www.youtube.com/embed/dCiN7SOyzhU"
   },
   {
     id: "4",
-    title: "Boxing Footwork Fundamentals",
-    instructor: "Freddie Roach",
+    title: "Boxing Footwork Basics",
+    instructor: "Precision Striking",
     duration: "14:15",
     difficulty: "Beginner",
     category: "Boxing",
-    description: "Master the footwork that makes great boxers. Movement, angles, and positioning.",
-    thumbnail: "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=300&fit=crop",
+    description: "Master fundamental boxing footwork patterns. Learn how to move efficiently and maintain balance while striking.",
+    thumbnail: "https://img.youtube.com/vi/TQNNhEaQKD8/maxresdefault.jpg",
     rating: 4.7,
     views: 31200,
     isFree: true,
     tags: ["Footwork", "Boxing", "Movement"],
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    videoUrl: "https://www.youtube.com/embed/TQNNhEaQKD8"
   },
   {
     id: "5",
-    title: "Submission Chain Sequences",
-    instructor: "Ryan Hall",
+    title: "Armbar from Guard",
+    instructor: "BJJ Fanatics",
     duration: "22:18",
     difficulty: "Advanced",
     category: "BJJ",
-    description: "Advanced submission chains that flow seamlessly from one technique to another.",
-    thumbnail: "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=400&h=300&fit=crop",
+    description: "High-level armbar techniques from the guard position. Learn setups, grips, and finishing details.",
+    thumbnail: "https://img.youtube.com/vi/pe_yqleGjQE/maxresdefault.jpg",
     rating: 4.9,
     views: 12800,
     isFree: true,
-    tags: ["Submissions", "Chains", "Advanced"],
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    tags: ["Submissions", "Armbar", "Guard"],
+    videoUrl: "https://www.youtube.com/embed/pe_yqleGjQE"
   },
   {
     id: "6",
-    title: "Wrestling Shots and Setups",
-    instructor: "Jordan Burroughs",
+    title: "Double Leg Takedown",
+    instructor: "FloWrestling",
     duration: "16:42",
     difficulty: "Intermediate",
     category: "Wrestling",
-    description: "Olympic champion teaches explosive takedown setups and finishing techniques.",
-    thumbnail: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop",
+    description: "Perfect your double leg takedown technique with proper setup, penetration, and finish from top wrestling coaches.",
+    thumbnail: "https://img.youtube.com/vi/5nT4tjHhE3w/maxresdefault.jpg",
     rating: 4.8,
     views: 19450,
     isFree: true,
-    tags: ["Wrestling", "Takedowns", "Setups"],
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    tags: ["Wrestling", "Takedowns", "Double Leg"],
+    videoUrl: "https://www.youtube.com/embed/5nT4tjHhE3w"
+  },
+  {
+    id: "7",
+    title: "Jab Cross Combination",
+    instructor: "ExpertBoxing",
+    duration: "11:30",
+    difficulty: "Beginner",
+    category: "Boxing",
+    description: "Learn the most fundamental boxing combination. Proper form, timing, and power generation for the 1-2 combo.",
+    thumbnail: "https://img.youtube.com/vi/8qQ0W0Ajw4M/maxresdefault.jpg",
+    rating: 4.6,
+    views: 42300,
+    isFree: true,
+    tags: ["Boxing", "Combinations", "Jab"],
+    videoUrl: "https://www.youtube.com/embed/8qQ0W0Ajw4M"
+  },
+  {
+    id: "8",
+    title: "Triangle Choke Setup",
+    instructor: "Invisible Jiu Jitsu",
+    duration: "19:45",
+    difficulty: "Intermediate",
+    category: "BJJ",
+    description: "Master the triangle choke from multiple positions. Learn the mechanics and troubleshooting for this essential submission.",
+    thumbnail: "https://img.youtube.com/vi/lsYgYA7CqxM/maxresdefault.jpg",
+    rating: 4.8,
+    views: 16750,
+    isFree: true,
+    tags: ["Triangle", "Submissions", "BJJ"],
+    videoUrl: "https://www.youtube.com/embed/lsYgYA7CqxM"
+  },
+  {
+    id: "9",
+    title: "Muay Thai Kicks",
+    instructor: "Muay Thai Scholar",
+    duration: "17:22",
+    difficulty: "Intermediate",
+    category: "Muay Thai",
+    description: "Develop powerful and technical kicks. Learn proper hip rotation, timing, and target selection for effective striking.",
+    thumbnail: "https://img.youtube.com/vi/Zt_Q4aqwW5M/maxresdefault.jpg",
+    rating: 4.7,
+    views: 28900,
+    isFree: true,
+    tags: ["Kicks", "Muay Thai", "Technique"],
+    videoUrl: "https://www.youtube.com/embed/Zt_Q4aqwW5M"
+  },
+  {
+    id: "10",
+    title: "Ground Control Basics",
+    instructor: "John Danaher",
+    duration: "24:15",
+    difficulty: "Advanced",
+    category: "BJJ",
+    description: "Learn fundamental concepts of ground control from one of the most respected BJJ instructors in the world.",
+    thumbnail: "https://img.youtube.com/vi/BWitv9AKoNU/maxresdefault.jpg",
+    rating: 4.9,
+    views: 8900,
+    isFree: true,
+    tags: ["Control", "Fundamentals", "Strategy"],
+    videoUrl: "https://www.youtube.com/embed/BWitv9AKoNU"
   }
 ];
 
@@ -141,16 +201,16 @@ export default function Lessons() {
               Elite Training Lessons
             </h1>
             <p className="text-xl mb-6 opacity-90">
-              Learn from world champions and legendary instructors. All lessons are completely free.
+              Get exclusive access to premium training content from world-class instructors like Bernardo Faria, John Danaher, and Firas Zahabi. All lessons are completely free - no hidden fees, no subscriptions required.
             </p>
             <div className="flex justify-center gap-8 text-sm">
               <div className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
-                <span>50+ World-Class Instructors</span>
+                <span>Elite Instructors</span>
               </div>
               <div className="flex items-center gap-2">
                 <Play className="h-5 w-5" />
-                <span>200+ Free Lessons</span>
+                <span>10+ Free Lessons</span>
               </div>
               <div className="flex items-center gap-2">
                 <Award className="h-5 w-5" />
@@ -278,10 +338,10 @@ export default function Lessons() {
           <h2 className="text-3xl font-bold text-center mb-12">Learn from Legends</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { name: "Marcelo Garcia", specialty: "BJJ Legend", achievements: "5x World Champion" },
-              { name: "Daniel Cormier", specialty: "MMA Champion", achievements: "Former UFC Champion" },
-              { name: "Saenchai", specialty: "Muay Thai King", achievements: "300+ Fight Wins" },
-              { name: "Freddie Roach", specialty: "Boxing Coach", achievements: "Trainer of Champions" }
+              { name: "Bernardo Faria", specialty: "BJJ Legend", achievements: "5x World Champion" },
+              { name: "Firas Zahabi", specialty: "MMA Coach", achievements: "GSP's Coach" },
+              { name: "John Danaher", specialty: "BJJ Mastermind", achievements: "Elite Coach" },
+              { name: "ExpertBoxing", specialty: "Boxing Channel", achievements: "1M+ Subscribers" }
             ].map((instructor, index) => (
               <Card key={index} className="text-center">
                 <CardHeader>
@@ -304,7 +364,7 @@ export default function Lessons() {
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-4">Ready to Train with the Best?</h2>
             <p className="text-xl mb-6 opacity-90">
-              Join thousands of fighters already learning from world champions
+              Join hundreds of fighters already learning from elite instructors
             </p>
             <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100">
               Start Your Free Training Now

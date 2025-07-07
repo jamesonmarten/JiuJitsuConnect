@@ -137,7 +137,7 @@ export default function Landing() {
               Learn from World Champions - Completely Free
             </h2>
             <p className="text-xl opacity-90 max-w-3xl mx-auto">
-              Get exclusive access to premium training content from legendary fighters like Marcelo Garcia, Daniel Cormier, and Saenchai. 
+              Get exclusive access to premium training content from world-class instructors like Bernardo Faria, John Danaher, and Firas Zahabi. 
               All lessons are completely free - no hidden fees, no subscriptions required.
             </p>
           </div>
@@ -147,7 +147,7 @@ export default function Landing() {
               <div className="bg-white/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Play className="h-8 w-8" />
               </div>
-              <h3 className="text-xl font-bold mb-2">200+ Free Lessons</h3>
+              <h3 className="text-xl font-bold mb-2">10+ Free Lessons</h3>
               <p className="opacity-90">Complete techniques from beginner to advanced</p>
             </div>
             <div className="text-center">
