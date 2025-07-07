@@ -40,6 +40,7 @@ function Router() {
       <div className="min-h-screen bg-background">
         <Switch>
           <Route path="/" component={Landing} />
+          <Route path="/guide" component={UserGuide} />
           <Route component={NotFound} />
         </Switch>
       </div>

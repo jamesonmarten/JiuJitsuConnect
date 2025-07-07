@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Users, Star, MapPin, Camera, Book, Award, Zap, Target, Trophy } from "lucide-react";
+import { Users, Star, MapPin, Camera, Book, Award, Zap, Target, Trophy, BookOpen } from "lucide-react";
 
 export default function Landing() {
   return (
@@ -139,14 +139,25 @@ export default function Landing() {
           <p className="text-muted-foreground mb-6 text-lg">
             Join Orlando's most elite MMA community and start your journey to greatness today.
           </p>
-          <Button 
-            size="lg" 
-            onClick={() => window.location.href = '/api/login'}
-            className="bg-gradient-to-r from-orange-500 to-red-600 text-white hover:from-orange-600 hover:to-red-700 border-none shadow-lg px-8 py-3 text-lg"
-          >
-            <Zap className="mr-2 h-5 w-5" />
-            Start Training Now
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              size="lg" 
+              onClick={() => window.location.href = '/api/login'}
+              className="bg-gradient-to-r from-orange-500 to-red-600 text-white hover:from-orange-600 hover:to-red-700 border-none shadow-lg px-8 py-3 text-lg"
+            >
+              <Zap className="mr-2 h-5 w-5" />
+              Start Training Now
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline"
+              onClick={() => window.location.href = '/guide'}
+              className="border-orange-300 text-orange-700 hover:bg-orange-50 px-8 py-3 text-lg"
+            >
+              <BookOpen className="mr-2 h-5 w-5" />
+              Elite Guide
+            </Button>
+          </div>
         </div>
       </div>
     </div>
