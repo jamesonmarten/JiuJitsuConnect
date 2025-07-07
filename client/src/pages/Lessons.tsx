@@ -26,11 +26,11 @@ const lessons: Lesson[] = [
   {
     id: "1",
     title: "Closed Guard Fundamentals",
-    instructor: "Bernardo Faria",
+    instructor: "BJJ Expert",
     duration: "12:45",
     difficulty: "Beginner",
     category: "BJJ",
-    description: "Learn the essential closed guard techniques from 5x World Champion Bernardo Faria. Master the foundations that every BJJ practitioner needs.",
+    description: "Learn essential closed guard techniques from experienced BJJ instructors. Master the foundations that every practitioner needs.",
     thumbnail: "https://img.youtube.com/vi/RYn7Th3aGgw/maxresdefault.jpg",
     rating: 4.9,
     views: 15420,
@@ -41,11 +41,11 @@ const lessons: Lesson[] = [
   {
     id: "2",
     title: "Sprawl Defense Technique",
-    instructor: "Firas Zahabi",
+    instructor: "MMA Expert",
     duration: "18:32",
     difficulty: "Intermediate",
     category: "MMA",
-    description: "GSP's coach demonstrates proper sprawl technique for MMA takedown defense. Essential skills for any fighter.",
+    description: "Learn proper sprawl technique for MMA takedown defense from experienced coaches. Essential skills for any fighter.",
     thumbnail: "https://img.youtube.com/vi/UB6nHgi_1uo/maxresdefault.jpg",
     rating: 4.8,
     views: 23150,
@@ -56,11 +56,11 @@ const lessons: Lesson[] = [
   {
     id: "3",
     title: "Thai Clinch Control",
-    instructor: "Sylvie von Duuglas-Ittu",
+    instructor: "Muay Thai Expert",
     duration: "15:20",
     difficulty: "Advanced",
     category: "Muay Thai",
-    description: "Advanced clinch control techniques from one of the most experienced western Muay Thai fighters training in Thailand.",
+    description: "Advanced clinch control techniques from experienced Muay Thai instructors. Master close-range combat skills.",
     thumbnail: "https://img.youtube.com/vi/GohqyCbrt1U/maxresdefault.jpg",
     rating: 4.9,
     views: 18900,
@@ -71,7 +71,7 @@ const lessons: Lesson[] = [
   {
     id: "4",
     title: "Boxing Footwork Basics",
-    instructor: "Precision Striking",
+    instructor: "Boxing Expert",
     duration: "14:15",
     difficulty: "Beginner",
     category: "Boxing",
@@ -86,7 +86,7 @@ const lessons: Lesson[] = [
   {
     id: "5",
     title: "Armbar from Guard",
-    instructor: "BJJ Fanatics",
+    instructor: "BJJ Expert",
     duration: "22:18",
     difficulty: "Advanced",
     category: "BJJ",
@@ -101,11 +101,11 @@ const lessons: Lesson[] = [
   {
     id: "6",
     title: "Double Leg Takedown",
-    instructor: "FloWrestling",
+    instructor: "Wrestling Expert",
     duration: "16:42",
     difficulty: "Intermediate",
     category: "Wrestling",
-    description: "Perfect your double leg takedown technique with proper setup, penetration, and finish from top wrestling coaches.",
+    description: "Perfect your double leg takedown technique with proper setup, penetration, and finish from experienced coaches.",
     thumbnail: "https://img.youtube.com/vi/4DHzLvLd-0Y/maxresdefault.jpg",
     rating: 4.8,
     views: 19450,
@@ -116,7 +116,7 @@ const lessons: Lesson[] = [
   {
     id: "7",
     title: "Jab Cross Combination",
-    instructor: "ExpertBoxing",
+    instructor: "Boxing Expert",
     duration: "11:30",
     difficulty: "Beginner",
     category: "Boxing",
@@ -131,7 +131,7 @@ const lessons: Lesson[] = [
   {
     id: "8",
     title: "Triangle Choke Setup",
-    instructor: "Invisible Jiu Jitsu",
+    instructor: "BJJ Expert",
     duration: "19:45",
     difficulty: "Intermediate",
     category: "BJJ",
@@ -146,7 +146,7 @@ const lessons: Lesson[] = [
   {
     id: "9",
     title: "Muay Thai Kicks",
-    instructor: "Muay Thai Scholar",
+    instructor: "Muay Thai Expert",
     duration: "17:22",
     difficulty: "Intermediate",
     category: "Muay Thai",
@@ -161,11 +161,11 @@ const lessons: Lesson[] = [
   {
     id: "10",
     title: "Ground Control Basics",
-    instructor: "John Danaher",
+    instructor: "BJJ Expert",
     duration: "24:15",
     difficulty: "Advanced",
     category: "BJJ",
-    description: "Learn fundamental concepts of ground control from one of the most respected BJJ instructors in the world.",
+    description: "Learn fundamental concepts of ground control from experienced BJJ instructors. Master positional dominance.",
     thumbnail: "https://img.youtube.com/vi/BWitv9AKoNU/maxresdefault.jpg",
     rating: 4.9,
     views: 8900,
@@ -221,7 +221,7 @@ export default function Lessons() {
               Elite Training Lessons
             </h1>
             <p className="text-xl mb-6 opacity-90">
-              Get exclusive access to premium training content from world-class instructors like Bernardo Faria, John Danaher, and Firas Zahabi. All lessons are completely free - no hidden fees, no subscriptions required.
+              Get exclusive access to premium training content from experienced martial arts experts and certified instructors. All lessons are completely free - no hidden fees, no subscriptions required.
             </p>
             <div className="flex justify-center gap-8 text-sm">
               <div className="flex items-center gap-2">

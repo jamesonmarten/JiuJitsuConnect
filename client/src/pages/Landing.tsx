@@ -137,7 +137,7 @@ export default function Landing() {
               Learn from World Champions - Completely Free
             </h2>
             <p className="text-xl opacity-90 max-w-3xl mx-auto">
-              Get exclusive access to premium training content from world-class instructors like Bernardo Faria, John Danaher, and Firas Zahabi. 
+              Get exclusive access to premium training content from experienced martial arts experts and certified instructors. 
               All lessons are completely free - no hidden fees, no subscriptions required.
             </p>
           </div>
