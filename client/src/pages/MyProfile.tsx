@@ -9,9 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Edit, BookOpen, Camera, Settings, Award, Plus, Upload } from "lucide-react";
+import { User, Edit, BookOpen, Camera, Settings, Award, Plus, Upload, Play } from "lucide-react";
 import { Link } from "wouter";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -19,6 +19,12 @@ export default function MyProfile() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Fetch training media
+  const { data: trainingMedia = [] } = useQuery({
+    queryKey: ["/api/training-media"],
+    enabled: !!user,
+  });
   
   const [journalModalOpen, setJournalModalOpen] = useState(false);
   const [mediaModalOpen, setMediaModalOpen] = useState(false);
@@ -34,6 +40,7 @@ export default function MyProfile() {
     description: "",
     mediaType: "",
     techniques: "",
+    mediaUrl: "",
     isPublic: false,
   });
 
@@ -70,6 +77,7 @@ export default function MyProfile() {
         description: "",
         mediaType: "",
         techniques: "",
+        mediaUrl: "",
         isPublic: false,
       });
       toast({
@@ -99,7 +107,7 @@ export default function MyProfile() {
   };
 
   const handleMediaSubmit = () => {
-    if (!mediaForm.title || !mediaForm.mediaType) {
+    if (!mediaForm.title || !mediaForm.mediaType || !mediaForm.mediaUrl) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
@@ -112,9 +120,9 @@ export default function MyProfile() {
       title: mediaForm.title,
       description: mediaForm.description,
       mediaType: mediaForm.mediaType,
-      techniques: mediaForm.techniques,
+      techniques: mediaForm.techniques ? mediaForm.techniques.split(',').map(t => t.trim()) : [],
       isPublic: mediaForm.isPublic,
-      mediaUrl: "placeholder-url", // In real implementation, this would come from file upload
+      mediaUrl: mediaForm.mediaUrl,
     });
   };
 
@@ -297,6 +305,72 @@ export default function MyProfile() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Training Media Gallery */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Training Media</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {trainingMedia.length === 0 ? (
+            <div className="text-center py-8">
+              <Camera className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <div className="text-muted-foreground mb-4">
+                No training media uploaded yet. Share your training sessions with the community!
+              </div>
+              <Button onClick={() => setMediaModalOpen(true)}>
+                <Upload className="h-4 w-4 mr-2" />
+                Upload First Media
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {trainingMedia.map((media: any) => (
+                <Card key={media.id} className="overflow-hidden">
+                  <div className="aspect-video bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                    {media.mediaType === 'video' ? (
+                      <div className="text-center">
+                        <Play className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                        <p className="text-sm text-muted-foreground">Video: {media.title}</p>
+                      </div>
+                    ) : (
+                      <div className="text-center">
+                        <Camera className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                        <p className="text-sm text-muted-foreground">Photo: {media.title}</p>
+                      </div>
+                    )}
+                  </div>
+                  <CardContent className="p-4">
+                    <h4 className="font-semibold mb-2">{media.title}</h4>
+                    {media.description && (
+                      <p className="text-sm text-muted-foreground mb-2">{media.description}</p>
+                    )}
+                    {media.techniques && media.techniques.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {media.techniques.map((technique: string, index: number) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {technique}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">
+                        {media.mediaType === 'video' ? '🎥' : '📸'} {media.mediaType}
+                      </span>
+                      {media.isPublic && (
+                        <Badge variant="outline" className="text-xs">
+                          Public
+                        </Badge>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Recent Activity */}
       <Card>
@@ -490,8 +564,17 @@ export default function MyProfile() {
               <Label htmlFor="isPublic">Make this media public</Label>
             </div>
 
-            <div className="text-sm text-muted-foreground bg-blue-50 dark:bg-blue-950 p-3 rounded">
-              📝 Note: File upload functionality would be implemented here in a real application.
+            <div>
+              <Label htmlFor="mediaUrl">Media URL <span className="text-red-500">*</span></Label>
+              <Input
+                id="mediaUrl"
+                placeholder="https://example.com/media/video.mp4"
+                value={mediaForm.mediaUrl}
+                onChange={(e) => setMediaForm(prev => ({ ...prev, mediaUrl: e.target.value }))}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                For demo purposes, paste a direct URL to your media file
+              </p>
             </div>
 
             <div className="flex gap-2 pt-4">

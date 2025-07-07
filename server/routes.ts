@@ -540,6 +540,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create new test user endpoint (for development)
+  app.post('/api/create-test-user', async (req, res) => {
+    try {
+      const { firstName, lastName, email, role, skillLevel, gymAffiliation, location } = req.body;
+      
+      // Generate a unique ID
+      const userId = `${firstName.toLowerCase()}-${lastName.toLowerCase()}-${Date.now()}`;
+      
+      // Create user
+      const userData = {
+        id: userId,
+        email: email || `${firstName.toLowerCase()}.${lastName.toLowerCase()}@grapplr.com`,
+        firstName,
+        lastName,
+        profileImageUrl: null,
+      };
+      
+      const user = await storage.upsertUser(userData);
+      
+      // Create profile
+      const profileData = {
+        userId: user.id,
+        role: role || 'member',
+        skillLevel: skillLevel || 'beginner',
+        gymAffiliation: gymAffiliation || 'Independent',
+        location: location || 'Orlando, FL',
+        beltRank: 'white',
+        bio: `Training in ${gymAffiliation || 'Orlando area'}. Looking to improve my skills and find training partners.`,
+        trainingGoals: 'Improve technique and conditioning',
+        availability: 'flexible',
+        phone: `(407) 555-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
+        isActive: true,
+      };
+      
+      const profile = await storage.createProfile(profileData);
+      
+      res.json({ 
+        success: true, 
+        message: `Test user ${firstName} ${lastName} created successfully`,
+        user: { ...user, profile }
+      });
+    } catch (error) {
+      console.error("Error creating test user:", error);
+      res.status(500).json({ message: "Failed to create test user" });
+    }
+  });
+
   // Create test training session (for development)
   app.post('/api/create-test-session', isAuthenticated, async (req: any, res) => {
     try {
