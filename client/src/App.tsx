@@ -16,6 +16,7 @@ import InstructorNotes from "@/pages/InstructorNotes";
 import GymFinder from "@/pages/GymFinder";
 import Recommendations from "@/pages/Recommendations";
 import TrainingSessions from "@/pages/TrainingSessions";
+import UserGuide from "@/pages/UserGuide";
 import Navbar from "@/components/Navbar";
 
 function Router() {
@@ -60,6 +61,7 @@ function Router() {
           <Route path="/gym-finder" component={GymFinder} />
           <Route path="/recommendations" component={Recommendations} />
           <Route path="/training-sessions" component={TrainingSessions} />
+          <Route path="/guide" component={UserGuide} />
           <Route component={NotFound} />
         </Switch>
       </main>

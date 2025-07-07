@@ -296,7 +296,7 @@ export default function Home() {
         {showTestSection && (
           <CardContent className="space-y-6">
             {/* Quick Test Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Button 
                 onClick={() => seedMembersMutation.mutate()}
                 disabled={seedMembersMutation.isPending}
@@ -317,6 +317,13 @@ export default function Home() {
                 <Button variant="outline" className="w-full">
                   <Search className="h-4 w-4 mr-2" />
                   View All Users
+                </Button>
+              </Link>
+
+              <Link href="/guide">
+                <Button variant="outline" className="w-full bg-orange-50 hover:bg-orange-100 border-orange-300 text-orange-700">
+                  <TestTube className="h-4 w-4 mr-2" />
+                  Elite Guide
                 </Button>
               </Link>
             </div>
