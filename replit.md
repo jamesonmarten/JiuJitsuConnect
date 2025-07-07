@@ -2,7 +2,7 @@
 
 ## Overview
 
-Grapplr is a full-stack web application built to connect the Jiu-Jitsu community in Longwood, Orlando, and surrounding areas. The platform allows users to find training partners, instructors, and rate their training experiences. It's built with modern web technologies and follows a client-server architecture with PostgreSQL for data persistence.
+MMA Connect is a full-stack web application built to connect the martial arts community across Central Florida and Southeastern Wisconsin, rapidly expanding nationwide due to popular demand. The platform allows users to find training partners, instructors, and rate their training experiences. It's built with modern web technologies and follows a client-server architecture with PostgreSQL for data persistence.
 
 ## System Architecture
 
@@ -119,3 +119,4 @@ Changelog:
 - July 07, 2025. Implemented complete upload functionality and deployment-ready testing tools
 - July 07, 2025. Created comprehensive Elite Athlete's Guide with step-by-step documentation
 - July 07, 2025. Implemented Dev Cabin Technologies branding throughout application as "MMA Connect by DCT"
+- July 07, 2025. Updated target markets to Central Florida and Southeastern Wisconsin with expansion messaging

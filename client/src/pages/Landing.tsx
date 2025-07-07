@@ -27,23 +27,29 @@ export default function Landing() {
                   Connect. Train. Conquer.
                 </span>
               </h1>
-              <p className="text-xl mb-8 text-gray-200 leading-relaxed max-w-2xl">
-                The ultimate MMA and Jiu-Jitsu community platform for Orlando fighters. 
-                Find elite training partners, track your evolution, and forge your path to greatness.
+              <p className="text-xl mb-6 text-gray-200 leading-relaxed max-w-2xl">
+                The premier MMA and Jiu-Jitsu community platform connecting elite fighters across Central Florida and Southeastern Wisconsin. 
+                Find training partners, track your evolution, and forge your path to greatness.
               </p>
+              
+              <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg p-4 mb-8 max-w-2xl">
+                <p className="text-orange-200 text-sm font-medium">
+                  🚀 <strong>Rapidly Expanding Due to Popular Demand!</strong> Now serving Central Florida and Southeastern Wisconsin with new locations launching monthly.
+                </p>
+              </div>
               
               <div className="flex items-center gap-6 mb-8">
                 <div className="flex items-center gap-2 text-orange-300">
                   <Users className="h-5 w-5" />
-                  <span className="text-sm font-medium">2,000+ Athletes</span>
+                  <span className="text-sm font-medium">500+ Athletes</span>
                 </div>
                 <div className="flex items-center gap-2 text-orange-300">
                   <MapPin className="h-5 w-5" />
-                  <span className="text-sm font-medium">50+ Gyms</span>
+                  <span className="text-sm font-medium">2 States</span>
                 </div>
                 <div className="flex items-center gap-2 text-orange-300">
                   <Star className="h-5 w-5 fill-current" />
-                  <span className="text-sm font-medium">Elite Network</span>
+                  <span className="text-sm font-medium">Expanding Fast</span>
                 </div>
               </div>
               <div className="flex gap-4">
@@ -86,7 +92,7 @@ export default function Landing() {
                       Professional Training Network
                     </h3>
                     <p className="text-white/90 mb-4">
-                      Connect with certified instructors, elite athletes, and serious practitioners in Orlando's premier martial arts community.
+                      Connect with certified instructors, elite athletes, and serious practitioners across Central Florida and Southeastern Wisconsin.
                     </p>
                     <div className="flex items-center justify-center gap-2 text-orange-300">
                       <Star className="h-4 w-4 fill-current" />
@@ -106,7 +112,7 @@ export default function Landing() {
                 <div className="absolute bottom-4 left-4">
                   <div className="bg-black/60 backdrop-blur-sm text-white px-3 py-2 rounded-lg text-sm">
                     <MapPin className="inline h-4 w-4 mr-1" />
-                    Orlando & Central Florida
+                    FL & WI - Expanding Nationwide
                   </div>
                 </div>
               </div>
@@ -230,8 +236,8 @@ export default function Landing() {
                 </div>
               </div>
               <p className="text-gray-300 mb-4">
-                Connecting elite martial artists across Orlando and beyond. 
-                Professional-grade platform for serious fighters.
+                Connecting elite martial artists across Central Florida and Southeastern Wisconsin. 
+                Professional-grade platform for serious fighters - expanding nationwide due to popular demand.
               </p>
             </div>
             

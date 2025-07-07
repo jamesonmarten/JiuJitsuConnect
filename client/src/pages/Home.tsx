@@ -98,7 +98,7 @@ export default function Home() {
             Welcome back, {user?.firstName || 'Fighter'}! 🥋
           </h1>
           <p className="text-xl text-muted-foreground">
-            Connect with the elite MMA community in Orlando & beyond
+            Connect with the elite MMA community in Central Florida & Southeastern Wisconsin
           </p>
         </div>
       </div>
