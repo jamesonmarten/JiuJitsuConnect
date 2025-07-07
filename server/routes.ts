@@ -279,9 +279,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/training-media', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
+      
+      // Process YouTube URLs to embed format
+      let mediaUrl = req.body.mediaUrl;
+      if (mediaUrl && mediaUrl.includes('youtube.com/watch?v=')) {
+        const videoId = mediaUrl.split('v=')[1]?.split('&')[0];
+        if (videoId) {
+          mediaUrl = `https://www.youtube.com/embed/${videoId}`;
+        }
+      } else if (mediaUrl && mediaUrl.includes('youtu.be/')) {
+        const videoId = mediaUrl.split('youtu.be/')[1]?.split('?')[0];
+        if (videoId) {
+          mediaUrl = `https://www.youtube.com/embed/${videoId}`;
+        }
+      }
+      
       const mediaData = insertTrainingMediaSchema.parse({
         ...req.body,
+        mediaUrl,
         userId,
+        techniques: req.body.techniques ? req.body.techniques.split(',').map((t: string) => t.trim()) : [],
       });
       
       const media = await storage.createTrainingMedia(mediaData);
@@ -502,14 +519,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/training-sessions/:id', isAuthenticated, async (req: any, res) => {
     try {
       const sessionId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
       const updates = req.body;
       
       if (updates.sessionDate) {
         updates.sessionDate = new Date(updates.sessionDate);
       }
       
-      const session = await storage.updateTrainingSession(sessionId, updates);
-      res.json(session);
+      // Verify the user owns this session or is the partner
+      const existingSession = await storage.getTrainingSessions(userId);
+      const session = existingSession.find(s => s.id === sessionId);
+      
+      if (!session) {
+        return res.status(404).json({ message: "Session not found" });
+      }
+      
+      const updatedSession = await storage.updateTrainingSession(sessionId, updates);
+      res.json(updatedSession);
     } catch (error) {
       console.error("Error updating training session:", error);
       res.status(400).json({ message: "Failed to update training session" });
@@ -526,6 +552,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting training session:", error);
       res.status(400).json({ message: "Failed to delete training session" });
+    }
+  });
+
+  // Test endpoint to create sample training sessions
+  app.post('/api/create-test-session', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const sessionData = {
+        organizerId: userId,
+        partnerId: "amanda-nunes", // Use a seeded partner
+        gymName: "Test Gym",
+        gymAddress: "123 Test St",
+        sessionDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
+        duration: 90,
+        trainingType: "sparring",
+        notes: "Test session for debugging",
+        status: "pending" as const,
+      };
+      
+      const session = await storage.createTrainingSession(sessionData);
+      res.json(session);
+    } catch (error) {
+      console.error("Error creating test session:", error);
+      res.status(500).json({ message: "Failed to create test session" });
     }
   });
 
@@ -629,10 +679,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // If address is provided, geocode it first
       if (address && !lat && !lng) {
         try {
-          const geocodeResponse = await fetch(
-            `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(address as string)}&key=${process.env.OPENCAGE_API_KEY}`
-          );
-          const geocodeData = await geocodeResponse.json();
+          // Try OpenCage first, then fall back to Nominatim
+          let geocodeData;
+          
+          if (process.env.OPENCAGE_API_KEY) {
+            const geocodeResponse = await fetch(
+              `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(address as string)}&key=${process.env.OPENCAGE_API_KEY}`
+            );
+            geocodeData = await geocodeResponse.json();
+          } else {
+            // Fallback to free Nominatim service
+            const geocodeResponse = await fetch(
+              `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address as string)}&limit=1`,
+              {
+                headers: {
+                  'User-Agent': 'MMA-Connect-App/1.0'
+                }
+              }
+            );
+            const nominatimData = await geocodeResponse.json();
+            geocodeData = {
+              results: nominatimData.map((item: any) => ({
+                geometry: { lat: parseFloat(item.lat), lng: parseFloat(item.lon) }
+              }))
+            };
+          }
           
           if (geocodeData.results && geocodeData.results.length > 0) {
             searchLat = geocodeData.results[0].geometry.lat;

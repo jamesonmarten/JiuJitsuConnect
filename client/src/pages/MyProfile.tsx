@@ -116,6 +116,17 @@ export default function MyProfile() {
       return;
     }
 
+    // Validate YouTube URL format
+    const youtubeUrlPattern = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[a-zA-Z0-9_-]{11}$/;
+    if (mediaForm.mediaUrl && !youtubeUrlPattern.test(mediaForm.mediaUrl) && !mediaForm.mediaUrl.includes('youtube.com/embed/')) {
+      toast({
+        title: "Invalid URL",
+        description: "Please provide a valid YouTube URL (e.g., https://youtu.be/UFura9kKstU)",
+        variant: "destructive",
+      });
+      return;
+    }
+
     createMediaMutation.mutate({
       title: mediaForm.title,
       description: mediaForm.description,
@@ -328,7 +339,16 @@ export default function MyProfile() {
               {trainingMedia.map((media: any) => (
                 <Card key={media.id} className="overflow-hidden">
                   <div className="aspect-video bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                    {media.mediaType === 'video' ? (
+                    {media.mediaType === 'video' && media.mediaUrl && media.mediaUrl.includes('youtube.com/embed/') ? (
+                      <iframe
+                        src={media.mediaUrl}
+                        title={media.title}
+                        className="w-full h-full rounded-t-lg"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    ) : media.mediaType === 'video' ? (
                       <div className="text-center">
                         <Play className="h-8 w-8 text-blue-600 mx-auto mb-2" />
                         <p className="text-sm text-muted-foreground">Video: {media.title}</p>
@@ -568,12 +588,12 @@ export default function MyProfile() {
               <Label htmlFor="mediaUrl">Media URL <span className="text-red-500">*</span></Label>
               <Input
                 id="mediaUrl"
-                placeholder="https://example.com/media/video.mp4"
+                placeholder="https://youtu.be/UFura9kKstU"
                 value={mediaForm.mediaUrl}
                 onChange={(e) => setMediaForm(prev => ({ ...prev, mediaUrl: e.target.value }))}
               />
               <p className="text-xs text-muted-foreground mt-1">
-                For demo purposes, paste a direct URL to your media file
+                Paste a YouTube URL (e.g., https://youtu.be/UFura9kKstU or https://youtube.com/watch?v=...)
               </p>
             </div>
 
