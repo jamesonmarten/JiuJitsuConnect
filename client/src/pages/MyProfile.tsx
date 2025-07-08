@@ -97,12 +97,15 @@ export default function MyProfile() {
       return;
     }
 
+    // Create title and content from form data to match database schema
+    const title = `${journalForm.sessionType} Session - ${journalForm.duration} minutes`;
+    const content = `Session Type: ${journalForm.sessionType}\nDuration: ${journalForm.duration} minutes\nMood: ${journalForm.mood}\n${journalForm.techniques ? `Techniques: ${journalForm.techniques}\n` : ''}${journalForm.notes ? `Notes: ${journalForm.notes}` : ''}`;
+
     createJournalMutation.mutate({
-      sessionType: journalForm.sessionType,
-      duration: parseInt(journalForm.duration),
-      techniques: journalForm.techniques,
+      title,
+      content,
       mood: journalForm.mood,
-      notes: journalForm.notes,
+      trainingType: journalForm.sessionType,
     });
   };
 
