@@ -74,21 +74,22 @@ export default function ContactModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Contact {recipientName}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
+        <form onSubmit={handleSubmit} className="space-y-4 p-1">
+          <div className="space-y-2">
             <Label htmlFor="name">Your Name <span className="text-red-500">*</span></Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => handleChange("name", e.target.value)}
               required
+              className="w-full"
             />
           </div>
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="email">Your Email <span className="text-red-500">*</span></Label>
             <Input
               id="email"
@@ -96,18 +97,20 @@ export default function ContactModal({
               value={formData.email}
               onChange={(e) => handleChange("email", e.target.value)}
               required
+              className="w-full"
             />
           </div>
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="subject">Subject <span className="text-red-500">*</span></Label>
             <Input
               id="subject"
               value={formData.subject}
               onChange={(e) => handleChange("subject", e.target.value)}
               required
+              className="w-full"
             />
           </div>
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="message">Message <span className="text-red-500">*</span></Label>
             <Textarea
               id="message"
@@ -116,23 +119,24 @@ export default function ContactModal({
               onChange={(e) => handleChange("message", e.target.value)}
               placeholder={`Hi ${recipientName}, I'm interested in training...`}
               required
+              className="w-full resize-none"
             />
           </div>
-          <div className="flex justify-between gap-2">
+          <div className="flex flex-col sm:flex-row justify-between gap-3 pt-2">
             <Button 
               type="button" 
               variant="outline" 
               onClick={() => setShowTrainingModal(true)}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 w-full sm:w-auto"
             >
               <Calendar className="h-4 w-4" />
               Schedule Session
             </Button>
-            <div className="flex gap-2">
-              <Button type="button" variant="outline" onClick={onClose}>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button type="button" variant="outline" onClick={onClose} className="flex-1 sm:flex-none">
                 Cancel
               </Button>
-              <Button type="submit" disabled={sendMessageMutation.isPending}>
+              <Button type="submit" disabled={sendMessageMutation.isPending} className="flex-1 sm:flex-none">
                 <Mail className="h-4 w-4 mr-2" />
                 {sendMessageMutation.isPending ? "Sending..." : "Send Message"}
               </Button>
