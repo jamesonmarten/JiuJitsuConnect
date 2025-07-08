@@ -127,3 +127,9 @@ Changelog:
   * Fixed media upload to properly handle YouTube URLs with automatic embed conversion
   * Fixed profile edit form submission error caused by incorrect API request parameter order
   * Added comprehensive YouTube URL validation with user-friendly error messages
+- July 08, 2025. Fixed gym finder geolocation functionality:
+  * Resolved "Use My Location" button not returning gym results
+  * Implemented geographic region detection for coordinate-based searches
+  * Optimized API response times by prioritizing curated gym database
+  * Added proper coordinate-to-region mapping for Florida and Wisconsin target markets
+  * Enhanced gym search to work seamlessly with both address strings and GPS coordinates

@@ -837,7 +837,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return parts.length > 0 ? parts.join(' ') : "Address not available";
   }
 
-  function getCuratedGyms(searchLat: number, searchLng: number, searchAddress: string): any[] {
+  function getCuratedGyms(searchLat: number, searchLng: number, searchAddress?: string): any[] {
     const curatedGyms = [
       // Orlando/Longwood Area - Central Florida
       {
@@ -1062,9 +1062,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     ];
 
-    // Determine which region we're searching in
+    // Determine which region we're searching in based on address or coordinates
     let relevantGyms = curatedGyms;
+    
     if (searchAddress) {
+      // Filter by address keywords
       const addressLower = searchAddress.toLowerCase();
       if (addressLower.includes('orlando') || addressLower.includes('longwood') || addressLower.includes('florida') || addressLower.includes('fl')) {
         relevantGyms = curatedGyms.filter(gym => gym.region === 'orlando' || gym.region === 'tampa');
@@ -1073,6 +1075,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else if (addressLower.includes('tampa')) {
         relevantGyms = curatedGyms.filter(gym => gym.region === 'tampa');
       }
+    } else {
+      // When using geolocation, determine region by geographic proximity
+      // Central Florida region: Orlando area
+      const isFloridaRegion = searchLat >= 25 && searchLat <= 31 && searchLng >= -85 && searchLng <= -79;
+      // Wisconsin region
+      const isWisconsinRegion = searchLat >= 42 && searchLat <= 47 && searchLng >= -93 && searchLng <= -86;
+      
+      if (isFloridaRegion) {
+        relevantGyms = curatedGyms.filter(gym => gym.region === 'orlando' || gym.region === 'tampa');
+      } else if (isWisconsinRegion) {
+        relevantGyms = curatedGyms.filter(gym => gym.region === 'milwaukee');
+      }
+      // If not in target regions, show all gyms (they'll be filtered by distance later)
     }
 
     // Calculate actual distances for relevant gyms and mark as featured
