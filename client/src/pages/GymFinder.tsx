@@ -232,8 +232,8 @@ export default function GymFinder() {
 
           <div className="border-t pt-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">Quick Location Select:</label>
+              <div className="space-y-2">
+                <label className="text-sm font-medium block">Quick Location Select:</label>
                 <Select value="" onValueChange={(value) => {
                   const preset = presetLocations.find(p => p.address === value);
                   if (preset) {
@@ -247,7 +247,7 @@ export default function GymFinder() {
                     }));
                   }
                 }}>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select a city..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -259,20 +259,21 @@ export default function GymFinder() {
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <label className="text-sm font-medium mb-2 block">Or Enter Address:</label>
+              <div className="space-y-2">
+                <label className="text-sm font-medium block">Or Enter Address:</label>
                 <Input
                   placeholder="Zip code, city, or address..."
                   value={location.address}
                   onChange={(e) => setLocation(prev => ({ ...prev, address: e.target.value }))}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddressSearch()}
+                  className="w-full"
                 />
               </div>
               <div className="flex items-end">
                 <Button 
                   onClick={handleAddressSearch}
                   disabled={!location.address.trim()}
-                  className="w-full flex items-center gap-2"
+                  className="w-full flex items-center justify-center gap-2"
                 >
                   <Search className="h-4 w-4" />
                   Search Gyms
@@ -281,10 +282,10 @@ export default function GymFinder() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
             <label className="text-sm font-medium">Search Radius:</label>
             <Select value={searchRadius} onValueChange={setSearchRadius}>
-              <SelectTrigger className="w-32">
+              <SelectTrigger className="w-full sm:w-32">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -420,16 +421,16 @@ export default function GymFinder() {
                     {gym.description}
                   </p>
                   
-                  <div className="flex gap-2 pt-4 border-t">
+                  <div className="flex flex-col gap-2 pt-4 border-t">
                     {(gym as any).status === 'contact_to_setup' ? (
                       <>
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => window.open(gym.website, "_blank")}
-                          className="flex-1"
+                          className="w-full justify-center"
                         >
-                          <Globe className="h-4 w-4 mr-1" />
+                          <Globe className="h-4 w-4 mr-2" />
                           Visit Website
                         </Button>
                         <Button
@@ -439,9 +440,9 @@ export default function GymFinder() {
                             const body = encodeURIComponent(`Hi ${gym.name} team,\n\nI'm interested in setting up your gym on the MMA Connect platform to help connect with martial arts practitioners in our community.\n\nPlease contact us to discuss partnership opportunities.\n\nBest regards`);
                             window.open(`mailto:${gym.phone ? gym.phone : 'info@mmaconnect.com'}?subject=${subject}&body=${body}`, "_blank");
                           }}
-                          className="flex-1"
+                          className="w-full justify-center"
                         >
-                          <Users className="h-4 w-4 mr-1" />
+                          <Users className="h-4 w-4 mr-2" />
                           Contact to Setup
                         </Button>
                       </>
@@ -452,9 +453,9 @@ export default function GymFinder() {
                             size="sm"
                             variant="outline"
                             onClick={() => window.open(gym.website, "_blank")}
-                            className="flex-1"
+                            className="w-full justify-center"
                           >
-                            <Globe className="h-4 w-4 mr-1" />
+                            <Globe className="h-4 w-4 mr-2" />
                             Website
                           </Button>
                         )}
@@ -465,9 +466,9 @@ export default function GymFinder() {
                             const query = encodeURIComponent(gym.address);
                             window.open(`https://maps.google.com/maps?q=${query}`, "_blank");
                           }}
-                          className="flex-1"
+                          className="w-full justify-center"
                         >
-                          <MapPin className="h-4 w-4 mr-1" />
+                          <MapPin className="h-4 w-4 mr-2" />
                           Directions
                         </Button>
                       </>
