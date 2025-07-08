@@ -753,8 +753,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const overpassData = await overpassResponse.json();
       
-      // Process and format the gym data
-      const gyms = overpassData.elements.map((element: any) => {
+      // Process and format the gym data from Overpass API
+      const overpassGyms = overpassData.elements.map((element: any) => {
         const lat = element.lat || element.center?.lat;
         const lon = element.lon || element.center?.lon;
         const distance = calculateDistance(searchLat, searchLng, lat, lon);
@@ -840,8 +840,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get curated/featured gyms
       const curatedGyms = getCuratedGyms(searchLat, searchLng, address as string);
       
-      // Combine results - prioritize featured gyms
-      const allGyms = [...curatedGyms, ...gyms];
+      // Combine results - prioritize featured gyms, fallback to overpass data if no Google results
+      const allGyms = [...curatedGyms, ...gyms, ...overpassGyms];
       const uniqueGyms = allGyms.filter((gym, index, self) => 
         index === self.findIndex(g => 
           g.name.toLowerCase() === gym.name.toLowerCase() || 
