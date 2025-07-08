@@ -174,21 +174,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Contact form endpoint
-  app.post('/api/contact', isAuthenticated, async (req: any, res) => {
-    try {
-      const { name, email, subject, message, toUserId } = req.body;
-      
-      // In a real implementation, this would send an email
-      // For now, we'll just return success
-      console.log('Contact form submission:', { name, email, subject, message, toUserId });
-      
-      res.json({ message: "Message sent successfully" });
-    } catch (error) {
-      console.error("Error sending message:", error);
-      res.status(500).json({ message: "Failed to send message" });
-    }
-  });
+
 
   // Instructor Notes routes
   app.post('/api/instructor-notes', isAuthenticated, async (req: any, res) => {

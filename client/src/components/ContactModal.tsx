@@ -36,7 +36,7 @@ export default function ContactModal({
 
   const sendMessageMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      await apiRequest("POST", "/api/contact", {
+      await apiRequest("/api/contact", "POST", {
         ...data,
         toUserId: recipientId,
       });
