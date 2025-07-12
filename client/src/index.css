@@ -141,6 +141,55 @@
       grid-template-columns: repeat(3, 1fr);
     }
   }
+  
+  /* Additional mobile-specific fixes */
+  @media (max-width: 768px) {
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    
+    * {
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    
+    /* Prevent text overflow */
+    h1, h2, h3, h4, h5, h6 {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    
+    /* Ensure buttons don't overflow */
+    .btn, button {
+      max-width: 100%;
+      word-wrap: break-word;
+    }
+    
+    /* Fix for cards and components */
+    .card, .bg-card {
+      max-width: 100%;
+    }
+    
+    /* Fix specific mobile text sizing issues */
+    .text-4xl {
+      font-size: 2rem;
+    }
+    
+    .text-6xl {
+      font-size: 2.5rem;
+    }
+    
+    .text-2xl {
+      font-size: 1.5rem;
+    }
+    
+    /* Prevent gradient text from overflowing */
+    .bg-gradient-to-r {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+  }
 
   /* Prevent horizontal overflow on all elements */
   .overflow-safe {

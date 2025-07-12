@@ -11,14 +11,14 @@ export default function Landing() {
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIyIi8+PC9nPjwvZz48L3N2Zz4=')] repeat"></div>
         </div>
         
-        <div className="relative container mx-auto px-4 py-24 min-h-screen flex items-center">
-          <div className="grid lg:grid-cols-2 gap-16 items-center w-full">
-            <div>
+        <div className="relative container mx-auto px-4 py-12 lg:py-24 min-h-screen flex items-center">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center w-full">
+            <div className="w-full">
               <div className="mb-4">
-                <h2 className="text-2xl font-bold text-orange-300 mb-1">MMA Connect</h2>
-                <p className="text-lg text-orange-200">by Dev Cabin Technologies</p>
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-orange-300 mb-1">MMA Connect</h2>
+                <p className="text-sm sm:text-base lg:text-lg text-orange-200">by Dev Cabin Technologies</p>
               </div>
-              <h1 className="text-4xl lg:text-6xl font-bold mb-6">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-6xl font-bold mb-4 lg:mb-6 leading-tight">
                 <span className="bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent">
                   Dominate the Mat
                 </span>
@@ -27,59 +27,59 @@ export default function Landing() {
                   Connect. Train. Conquer.
                 </span>
               </h1>
-              <p className="text-xl mb-6 text-gray-200 leading-relaxed max-w-2xl">
+              <p className="text-base sm:text-lg lg:text-xl mb-4 lg:mb-6 text-gray-200 leading-relaxed">
                 The premier MMA and Jiu-Jitsu community platform connecting elite fighters across Central Florida and Southeastern Wisconsin. 
                 Find training partners, track your evolution, and forge your path to greatness.
               </p>
               
-              <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg p-4 mb-8 max-w-2xl">
-                <p className="text-orange-200 text-sm font-medium">
+              <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg p-3 lg:p-4 mb-6 lg:mb-8">
+                <p className="text-orange-200 text-xs sm:text-sm font-medium">
                   🚀 <strong>Rapidly Expanding Due to Popular Demand!</strong> Now serving Central Florida and Southeastern Wisconsin with new locations launching monthly.
                 </p>
               </div>
               
-              <div className="flex items-center gap-6 mb-8">
+              <div className="flex flex-wrap items-center gap-4 lg:gap-6 mb-6 lg:mb-8">
                 <div className="flex items-center gap-2 text-orange-300">
-                  <Users className="h-5 w-5" />
-                  <span className="text-sm font-medium">500+ Athletes</span>
+                  <Users className="h-4 w-4 lg:h-5 lg:w-5" />
+                  <span className="text-xs sm:text-sm font-medium">500+ Athletes</span>
                 </div>
                 <div className="flex items-center gap-2 text-orange-300">
-                  <MapPin className="h-5 w-5" />
-                  <span className="text-sm font-medium">2 States</span>
+                  <MapPin className="h-4 w-4 lg:h-5 lg:w-5" />
+                  <span className="text-xs sm:text-sm font-medium">2 States</span>
                 </div>
                 <div className="flex items-center gap-2 text-orange-300">
-                  <Star className="h-5 w-5 fill-current" />
-                  <span className="text-sm font-medium">Expanding Fast</span>
+                  <Star className="h-4 w-4 lg:h-5 lg:w-5 fill-current" />
+                  <span className="text-xs sm:text-sm font-medium">Expanding Fast</span>
                 </div>
               </div>
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 lg:gap-4">
                 <Button 
                   size="lg" 
                   onClick={() => window.location.href = '/api/login'}
-                  className="bg-blue-600 text-white hover:bg-blue-700 border-none shadow-lg"
+                  className="bg-blue-600 text-white hover:bg-blue-700 border-none shadow-lg text-sm sm:text-base w-full sm:w-auto"
                 >
-                  <Users className="mr-2 h-5 w-5" />
+                  <Users className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   Get Started
                 </Button>
                 <Button 
                   size="lg" 
                   onClick={() => window.location.href = '/lessons'}
-                  className="bg-orange-500 text-white hover:bg-orange-600 border-none shadow-lg"
+                  className="bg-orange-500 text-white hover:bg-orange-600 border-none shadow-lg text-sm sm:text-base w-full sm:w-auto"
                 >
-                  <Play className="mr-2 h-5 w-5" />
+                  <Play className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   Free Lessons
                 </Button>
                 <Button 
                   size="lg" 
                   variant="outline" 
                   onClick={() => window.location.href = '/api/login'}
-                  className="border-2 border-white text-white hover:bg-white hover:text-blue-600 bg-transparent"
+                  className="border-2 border-white text-white hover:bg-white hover:text-blue-600 bg-transparent text-sm sm:text-base w-full sm:w-auto"
                 >
                   Sign In
                 </Button>
               </div>
             </div>
-            <div className="relative overflow-hidden rounded-xl">
+            <div className="relative overflow-hidden rounded-xl hidden lg:block">
               <div className="relative h-96 bg-gradient-to-br from-gray-900 via-gray-800 to-black">
                 <img 
                   src="https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&w=800&h=600&fit=crop" 
