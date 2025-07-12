@@ -421,6 +421,112 @@ const famousMMAMembers = [
       phone: "(407) 555-0120",
       isActive: true,
     }
+  },
+  // Wisconsin/Milwaukee Area Members
+  {
+    user: {
+      id: "milwaukee-mike",
+      email: "milwaukee.mike@grapplr.com",
+      firstName: "Mike",
+      lastName: "Mueller",
+      profileImageUrl: null,
+    },
+    profile: {
+      role: "instructor" as const,
+      skillLevel: "advanced" as const,
+      gymAffiliation: "Roufusport Milwaukee",
+      location: "Milwaukee, WI",
+      beltRank: "black",
+      bio: "Local Milwaukee instructor specializing in kickboxing and Brazilian Jiu-Jitsu.",
+      trainingGoals: "Build a strong community of fighters",
+      availability: "evenings",
+      phone: "(414) 555-0201",
+      isActive: true,
+    }
+  },
+  {
+    user: {
+      id: "wisconsin-warrior",
+      email: "sarah.wisconsin@grapplr.com", 
+      firstName: "Sarah",
+      lastName: "Johnson",
+      profileImageUrl: null,
+    },
+    profile: {
+      role: "member" as const,
+      skillLevel: "beginner" as const,
+      gymAffiliation: "Green Bay Fight Club",
+      location: "Green Bay, WI",
+      beltRank: "white",
+      bio: "New to MMA but eager to learn. Love training in the Wisconsin community.",
+      trainingGoals: "Learn fundamentals and stay fit",
+      availability: "mornings",
+      phone: "(920) 555-0203",
+      isActive: true,
+    }
+  },
+  {
+    user: {
+      id: "milwaukee-maria",
+      email: "maria.milwaukee@grapplr.com",
+      firstName: "Maria",
+      lastName: "Rodriguez",
+      profileImageUrl: null,
+    },
+    profile: {
+      role: "instructor" as const,
+      skillLevel: "professional" as const,
+      gymAffiliation: "Milwaukee MMA Academy",
+      location: "Milwaukee, WI",
+      beltRank: "black",
+      bio: "Professional fighter and instructor. Teaching striking and ground game in Milwaukee.",
+      trainingGoals: "Develop the next generation of fighters",
+      availability: "all day",
+      phone: "(414) 555-0204",
+      isActive: true,
+    }
+  },
+  {
+    user: {
+      id: "badger-bjj",
+      email: "tom.badger@grapplr.com",
+      firstName: "Tom",
+      lastName: "Kowalski",
+      profileImageUrl: null,
+    },
+    profile: {
+      role: "member" as const,
+      skillLevel: "advanced" as const,
+      gymAffiliation: "Badger Brazilian Jiu-Jitsu",
+      location: "Milwaukee, WI",
+      beltRank: "brown",
+      bio: "Brown belt in BJJ, active competitor in the Milwaukee area.",
+      trainingGoals: "Train for competitions and teach others",
+      availability: "evenings",
+      phone: "(414) 555-0205",
+      isActive: true,
+    }
+  },
+  {
+    user: {
+      id: "kenosha-kevin",
+      email: "kevin.kenosha@grapplr.com",
+      firstName: "Kevin",
+      lastName: "Anderson",
+      profileImageUrl: null,
+    },
+    profile: {
+      role: "member" as const,
+      skillLevel: "intermediate" as const,
+      gymAffiliation: "Kenosha Combat Club",
+      location: "Kenosha, WI",
+      beltRank: "blue",
+      bio: "Training in Kenosha area, passionate about mixed martial arts.",
+      trainingGoals: "Improve technique and conditioning",
+      availability: "weekends",
+      phone: "(262) 555-0206",
+      isActive: true,
+    }
   }
 ];
 

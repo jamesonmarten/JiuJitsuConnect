@@ -133,3 +133,8 @@ Changelog:
   * Optimized API response times by prioritizing curated gym database
   * Added proper coordinate-to-region mapping for Florida and Wisconsin target markets
   * Enhanced gym search to work seamlessly with both address strings and GPS coordinates
+- July 12, 2025. Enhanced location search functionality:
+  * Confirmed user location search is working correctly with case-insensitive matching
+  * Added Wisconsin/Milwaukee area members to seed data for better location search results
+  * Improved database with 5 additional Wisconsin users across Milwaukee, Green Bay, and Kenosha
+  * Location search now properly filters users by location strings using SQL ILIKE matching
