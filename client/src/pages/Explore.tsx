@@ -52,8 +52,8 @@ export default function Explore() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="mobile-container">
+        <div className="mobile-grid gap-4">
           {[...Array(6)].map((_, i) => (
             <Card key={i} className="animate-pulse">
               <CardContent className="p-6">
@@ -73,10 +73,10 @@ export default function Explore() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="mobile-container">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
           Discover Training Partners
         </h1>
         <p className="text-gray-600 dark:text-gray-300">
@@ -93,7 +93,7 @@ export default function Explore() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <Input
               placeholder="Search by name..."
               value={filters.search}
@@ -131,7 +131,7 @@ export default function Explore() {
       </Card>
 
       {/* Results */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="mobile-grid gap-4">
         {users.map((user) => (
           <Card key={user.id} className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardContent className="p-6">

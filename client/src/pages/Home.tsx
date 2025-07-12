@@ -83,21 +83,21 @@ export default function Home() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="mobile-container">
       {/* Welcome Section */}
       <div className="text-center mb-8">
         <div className="mb-4">
           <div className="flex items-center justify-center gap-3 mb-4">
             <span className="text-2xl">🥋</span>
             <div className="text-center">
-              <h2 className="text-xl font-bold text-blue-600">MMA Connect</h2>
-              <p className="text-sm text-muted-foreground">by Dev Cabin Technologies</p>
+              <h2 className="text-lg sm:text-xl font-bold text-blue-600">MMA Connect</h2>
+              <p className="text-xs sm:text-sm text-muted-foreground">by Dev Cabin Technologies</p>
             </div>
           </div>
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Welcome back, {user?.firstName || 'Fighter'}! 🥋
           </h1>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-lg sm:text-xl text-muted-foreground">
             Connect with the elite MMA community in Central Florida & Southeastern Wisconsin
           </p>
         </div>
@@ -129,7 +129,7 @@ export default function Home() {
       )}
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="mobile-grid gap-4 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
@@ -177,7 +177,7 @@ export default function Home() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         <Card className="hover:shadow-lg transition-shadow">
           <CardHeader>
             <div className="flex items-center gap-3">

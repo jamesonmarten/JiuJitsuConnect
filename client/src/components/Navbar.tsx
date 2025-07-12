@@ -23,14 +23,14 @@ export default function Navbar() {
 
   return (
     <nav className="bg-white border-b border-border sticky top-0 z-50 shadow-sm">
-      <div className="container mx-auto px-4">
+      <div className="w-full max-w-full mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="navbar-brand flex items-center gap-3">
+          <Link href="/" className="navbar-brand flex items-center gap-2 flex-shrink-0">
             <span className="text-xl">🥋</span>
             <div className="flex flex-col">
-              <span className="font-bold text-lg">MMA Connect</span>
-              <span className="text-xs text-muted-foreground">by Dev Cabin Technologies</span>
+              <span className="font-bold text-base sm:text-lg">MMA Connect</span>
+              <span className="text-xs text-muted-foreground hidden sm:block">by Dev Cabin Technologies</span>
             </div>
           </Link>
 
@@ -50,16 +50,16 @@ export default function Navbar() {
           </div>
 
           {/* User Menu */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-2">
+                <Button variant="ghost" className="flex items-center gap-2 p-2">
                   <img 
                     src={user?.profileImageUrl || `https://ui-avatars.com/api/?name=${user?.firstName}+${user?.lastName}`}
                     alt="Profile"
                     className="w-8 h-8 rounded-full object-cover"
                   />
-                  <span className="hidden sm:inline">
+                  <span className="hidden sm:inline text-sm truncate max-w-24">
                     {user?.firstName} {user?.lastName}
                   </span>
                 </Button>

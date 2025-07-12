@@ -51,24 +51,26 @@ function Router() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
       <Navbar />
-      <main className="flex-1 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900 pt-16">
-        <Switch>
-          <Route path="/" component={Home} />
-          <Route path="/explore" component={Explore} />
-          <Route path="/profile/:id" component={ProfileDetail} />
-          <Route path="/profile-edit" component={ProfileEdit} />
-          <Route path="/my-profile" component={MyProfile} />
-          <Route path="/ratings" component={Ratings} />
-          <Route path="/instructor-notes" component={InstructorNotes} />
-          <Route path="/gym-finder" component={GymFinder} />
-          <Route path="/recommendations" component={Recommendations} />
-          <Route path="/training-sessions" component={TrainingSessions} />
-          <Route path="/guide" component={UserGuide} />
-          <Route path="/lessons" component={Lessons} />
-          <Route component={NotFound} />
-        </Switch>
+      <main className="flex-1 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900 w-full max-w-full overflow-x-hidden">
+        <div className="w-full max-w-full px-4 py-6">
+          <Switch>
+            <Route path="/" component={Home} />
+            <Route path="/explore" component={Explore} />
+            <Route path="/profile/:id" component={ProfileDetail} />
+            <Route path="/profile-edit" component={ProfileEdit} />
+            <Route path="/my-profile" component={MyProfile} />
+            <Route path="/ratings" component={Ratings} />
+            <Route path="/instructor-notes" component={InstructorNotes} />
+            <Route path="/gym-finder" component={GymFinder} />
+            <Route path="/recommendations" component={Recommendations} />
+            <Route path="/training-sessions" component={TrainingSessions} />
+            <Route path="/guide" component={UserGuide} />
+            <Route path="/lessons" component={Lessons} />
+            <Route component={NotFound} />
+          </Switch>
+        </div>
       </main>
       <Footer />
     </div>
