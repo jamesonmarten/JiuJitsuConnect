@@ -35,8 +35,27 @@ export async function generateTrainingPartnerRecommendations(
       return [];
     }
 
-    // Create a detailed prompt for AI analysis
-    const prompt = `
+    // Try AI recommendations first, fallback to manual if it fails
+    try {
+      return await generateAIRecommendations(criteria, eligiblePartners);
+    } catch (aiError) {
+      console.warn("AI recommendations failed, using fallback:", aiError);
+      return generateFallbackRecommendations(criteria, eligiblePartners);
+    }
+  } catch (error) {
+    console.error("Error in generateTrainingPartnerRecommendations:", error);
+    return generateFallbackRecommendations(criteria, eligiblePartners);
+  }
+}
+
+async function generateAIRecommendations(
+  criteria: RecommendationCriteria,
+  eligiblePartners: UserWithProfile[]
+): Promise<TrainingPartnerRecommendation[]> {
+  const { currentUser, maxRecommendations = 5 } = criteria;
+
+  // Create a detailed prompt for AI analysis
+  const prompt = `
 You are a martial arts training partner recommendation expert. Analyze the current user's profile and recommend the best training partners from the available options.
 
 CURRENT USER PROFILE:
@@ -90,65 +109,55 @@ Return your response in JSON format:
 }
 `;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: "You are an expert martial arts training partner matching system. Provide thoughtful, specific recommendations based on compatibility factors."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.7,
-      max_tokens: 2000
-    });
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      {
+        role: "system",
+        content: "You are an expert martial arts training partner matching system. Provide thoughtful, specific recommendations based on compatibility factors."
+      },
+      {
+        role: "user",
+        content: prompt
+      }
+    ],
+    response_format: { type: "json_object" },
+    temperature: 0.7,
+    max_tokens: 2000
+  });
 
-    const aiResponse = JSON.parse(response.choices[0].message.content || '{"recommendations": []}');
-    
-    // Map AI recommendations back to user objects
-    const recommendations: TrainingPartnerRecommendation[] = aiResponse.recommendations
-      .map((rec: any) => {
-        const partnerIndex = rec.partnerIndex - 1; // Convert to 0-based index
-        const partner = eligiblePartners[partnerIndex];
-        
-        if (!partner) {
-          console.warn(`Partner at index ${partnerIndex} not found`);
-          return null;
-        }
+  const aiResponse = JSON.parse(response.choices[0].message.content || '{"recommendations": []}');
+  
+  // Map AI recommendations back to user objects
+  const recommendations: TrainingPartnerRecommendation[] = aiResponse.recommendations
+    .map((rec: any) => {
+      const partnerIndex = rec.partnerIndex - 1; // Convert to 0-based index
+      const partner = eligiblePartners[partnerIndex];
+      
+      if (!partner) {
+        console.warn(`Partner at index ${partnerIndex} not found`);
+        return null;
+      }
 
-        return {
-          user: partner,
-          compatibilityScore: Math.max(1, Math.min(100, rec.compatibilityScore)),
-          reasons: rec.reasons || [],
-          suggestedTrainingActivities: rec.suggestedActivities || []
-        };
-      })
-      .filter(Boolean) // Remove null entries
-      .slice(0, maxRecommendations); // Ensure we don't exceed max
+      return {
+        user: partner,
+        compatibilityScore: Math.max(1, Math.min(100, rec.compatibilityScore)),
+        reasons: rec.reasons || [],
+        suggestedTrainingActivities: rec.suggestedActivities || []
+      };
+    })
+    .filter(Boolean) // Remove null entries
+    .slice(0, maxRecommendations); // Ensure we don't exceed max
 
-    return recommendations;
-
-  } catch (error) {
-    console.error("Error generating AI recommendations:", error);
-    
-    // Fallback to basic compatibility scoring if AI fails
-    return generateFallbackRecommendations(criteria);
-  }
+  return recommendations;
 }
 
 // Fallback recommendation system using rule-based matching
 function generateFallbackRecommendations(
-  criteria: RecommendationCriteria
+  criteria: RecommendationCriteria,
+  eligiblePartners: UserWithProfile[]
 ): TrainingPartnerRecommendation[] {
-  const { currentUser, availablePartners, maxRecommendations = 5 } = criteria;
-  
-  const eligiblePartners = availablePartners.filter(
-    partner => partner.id !== currentUser.id
-  );
+  const { currentUser, maxRecommendations = 5 } = criteria;
 
   const scoredPartners = eligiblePartners.map(partner => {
     let score = 0;

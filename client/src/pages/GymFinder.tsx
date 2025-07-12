@@ -135,10 +135,10 @@ export default function GymFinder() {
     }));
   };
 
-  // Auto-get location on component mount
-  useEffect(() => {
-    getCurrentLocation();
-  }, []);
+  // Auto-get location on component mount (commented out to prevent auto-errors)
+  // useEffect(() => {
+  //   getCurrentLocation();
+  // }, []);
 
   // Query gyms based on location
   const { data: gyms = [], isLoading, error } = useQuery<Gym[]>({
@@ -152,7 +152,8 @@ export default function GymFinder() {
       } else if (location.address) {
         params.append("address", location.address);
       } else {
-        throw new Error("No location specified");
+        // Default to Orlando if no location provided
+        params.append("address", "Orlando, FL");
       }
       
       params.append("radius", searchRadius);
@@ -162,16 +163,24 @@ export default function GymFinder() {
       });
       
       if (!response.ok) {
-        throw new Error("Failed to fetch gyms");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to fetch gyms");
       }
       
       return response.json();
     },
-    enabled: !!(location.lat && location.lng) || !!location.address,
+    enabled: !!(location.lat && location.lng) || !!location.address || (!location.lat && !location.lng && !location.address),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const hasLocation = (location.lat && location.lng) || location.address;
+  
+  // Initialize with default search on page load
+  useEffect(() => {
+    if (!hasLocation && !location.locationError) {
+      setLocation(prev => ({ ...prev, address: "Orlando, FL" }));
+    }
+  }, [hasLocation, location.locationError]);
 
   return (
     <div className="container mx-auto px-4 py-8">
