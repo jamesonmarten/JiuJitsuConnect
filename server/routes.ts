@@ -7,7 +7,12 @@ import {
   insertRatingSchema,
   insertInstructorNoteSchema,
   insertJournalEntrySchema,
-  insertTrainingMediaSchema
+  insertTrainingMediaSchema,
+  insertGroupMessageSchema,
+  insertGroupMessageMemberSchema,
+  insertGroupChatMessageSchema,
+  insertCalendarEventSchema,
+  insertCalendarEventParticipantSchema
 } from "@shared/schema";
 import { z } from "zod";
 import { seedMMAMembers } from "./seedMembers";
@@ -542,6 +547,154 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting training session:", error);
       res.status(400).json({ message: "Failed to delete training session" });
+    }
+  });
+
+  // Group Message routes
+  app.post('/api/group-messages', isAuthenticated, async (req: any, res) => {
+    try {
+      const createdBy = req.user.claims.sub;
+      const groupData = insertGroupMessageSchema.parse({
+        ...req.body,
+        createdBy,
+      });
+      
+      const group = await storage.createGroupMessage(groupData);
+      
+      // Add creator as admin member
+      await storage.addGroupMember({
+        groupId: group.id,
+        userId: createdBy,
+        role: 'admin'
+      });
+      
+      res.json(group);
+    } catch (error) {
+      console.error("Error creating group message:", error);
+      res.status(400).json({ message: "Failed to create group message" });
+    }
+  });
+
+  app.get('/api/group-messages', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const groups = await storage.getUserGroupMessages(userId);
+      res.json(groups);
+    } catch (error) {
+      console.error("Error fetching group messages:", error);
+      res.status(500).json({ message: "Failed to fetch group messages" });
+    }
+  });
+
+  app.post('/api/group-messages/:id/chat', isAuthenticated, async (req: any, res) => {
+    try {
+      const groupId = parseInt(req.params.id);
+      const senderId = req.user.claims.sub;
+      const messageData = insertGroupChatMessageSchema.parse({
+        ...req.body,
+        groupId,
+        senderId,
+      });
+      
+      const message = await storage.createGroupChatMessage(messageData);
+      res.json(message);
+    } catch (error) {
+      console.error("Error sending group chat message:", error);
+      res.status(400).json({ message: "Failed to send group chat message" });
+    }
+  });
+
+  app.get('/api/group-messages/:id/chat', isAuthenticated, async (req: any, res) => {
+    try {
+      const groupId = parseInt(req.params.id);
+      const limit = parseInt(req.query.limit as string) || 50;
+      const offset = parseInt(req.query.offset as string) || 0;
+      
+      const messages = await storage.getGroupChatMessages(groupId, limit, offset);
+      res.json(messages);
+    } catch (error) {
+      console.error("Error fetching group chat messages:", error);
+      res.status(500).json({ message: "Failed to fetch group chat messages" });
+    }
+  });
+
+  // Calendar Event routes
+  app.post('/api/calendar-events', isAuthenticated, async (req: any, res) => {
+    try {
+      const createdBy = req.user.claims.sub;
+      const eventData = insertCalendarEventSchema.parse({
+        ...req.body,
+        createdBy,
+        startTime: new Date(req.body.startTime),
+        endTime: new Date(req.body.endTime),
+      });
+      
+      const event = await storage.createCalendarEvent(eventData);
+      
+      // Add creator as participant
+      await storage.addEventParticipant({
+        eventId: event.id,
+        userId: createdBy,
+        status: 'accepted'
+      });
+      
+      res.json(event);
+    } catch (error) {
+      console.error("Error creating calendar event:", error);
+      res.status(400).json({ message: "Failed to create calendar event" });
+    }
+  });
+
+  app.get('/api/calendar-events', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const events = await storage.getUserCalendarEvents(userId);
+      res.json(events);
+    } catch (error) {
+      console.error("Error fetching calendar events:", error);
+      res.status(500).json({ message: "Failed to fetch calendar events" });
+    }
+  });
+
+  app.get('/api/calendar-events/upcoming', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const events = await storage.getUpcomingEvents(userId, limit);
+      res.json(events);
+    } catch (error) {
+      console.error("Error fetching upcoming events:", error);
+      res.status(500).json({ message: "Failed to fetch upcoming events" });
+    }
+  });
+
+  app.post('/api/calendar-events/:id/participants', isAuthenticated, async (req: any, res) => {
+    try {
+      const eventId = parseInt(req.params.id);
+      const participantData = insertCalendarEventParticipantSchema.parse({
+        ...req.body,
+        eventId,
+      });
+      
+      const participant = await storage.addEventParticipant(participantData);
+      res.json(participant);
+    } catch (error) {
+      console.error("Error adding event participant:", error);
+      res.status(400).json({ message: "Failed to add event participant" });
+    }
+  });
+
+  app.put('/api/calendar-events/:id/participants/:userId', isAuthenticated, async (req: any, res) => {
+    try {
+      const eventId = parseInt(req.params.id);
+      const userId = req.params.userId;
+      const { status } = req.body;
+      
+      const participant = await storage.updateEventParticipantStatus(eventId, userId, status);
+      res.json(participant);
+    } catch (error) {
+      console.error("Error updating participant status:", error);
+      res.status(400).json({ message: "Failed to update participant status" });
     }
   });
 

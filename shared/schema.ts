@@ -199,6 +199,59 @@ export const gymMembers = pgTable("gym_members", {
   isActive: boolean("is_active").default(true),
 });
 
+// Group Messages table for group conversations
+export const groupMessages = pgTable("group_messages", {
+  id: serial("id").primaryKey(),
+  name: varchar("name").notNull(),
+  description: text("description"),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Group Message Members table for tracking group participants
+export const groupMessageMembers = pgTable("group_message_members", {
+  id: serial("id").primaryKey(),
+  groupId: integer("group_id").notNull().references(() => groupMessages.id),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  joinedAt: timestamp("joined_at").defaultNow(),
+  role: varchar("role").default("member"), // 'admin' or 'member'
+});
+
+// Group chat messages (extending existing messages table concept)
+export const groupChatMessages = pgTable("group_chat_messages", {
+  id: serial("id").primaryKey(),
+  groupId: integer("group_id").notNull().references(() => groupMessages.id),
+  senderId: varchar("sender_id").notNull().references(() => users.id),
+  content: text("content").notNull(),
+  sentAt: timestamp("sent_at").defaultNow(),
+});
+
+// Calendar Events table for scheduling meetings
+export const calendarEvents = pgTable("calendar_events", {
+  id: serial("id").primaryKey(),
+  title: varchar("title").notNull(),
+  description: text("description"),
+  startTime: timestamp("start_time").notNull(),
+  endTime: timestamp("end_time").notNull(),
+  location: text("location"),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  groupId: integer("group_id").references(() => groupMessages.id),
+  eventType: varchar("event_type").default("meeting"), // "meeting", "training", "competition", "social"
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Calendar Event Participants table for tracking meeting attendees
+export const calendarEventParticipants = pgTable("calendar_event_participants", {
+  id: serial("id").primaryKey(),
+  eventId: integer("event_id").notNull().references(() => calendarEvents.id),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  status: varchar("status").default("pending"), // 'pending', 'accepted', 'declined'
+  invitedAt: timestamp("invited_at").defaultNow(),
+  respondedAt: timestamp("responded_at"),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ one, many }) => ({
   profile: one(profiles, {
@@ -217,6 +270,11 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   trainingSessionsParticipated: many(trainingSessions, { relationName: "trainingSessionsParticipated" }),
   following: many(follows, { relationName: "following" }),
   followers: many(follows, { relationName: "followers" }),
+  createdGroups: many(groupMessages),
+  groupMemberships: many(groupMessageMembers),
+  groupChatMessages: many(groupChatMessages),
+  createdEvents: many(calendarEvents),
+  eventParticipations: many(calendarEventParticipants),
 }));
 
 export const profilesRelations = relations(profiles, ({ one }) => ({
@@ -305,6 +363,63 @@ export const followsRelations = relations(follows, ({ one }) => ({
   }),
 }));
 
+// Group Messages relations
+export const groupMessagesRelations = relations(groupMessages, ({ one, many }) => ({
+  creator: one(users, {
+    fields: [groupMessages.createdBy],
+    references: [users.id],
+  }),
+  members: many(groupMessageMembers),
+  messages: many(groupChatMessages),
+  events: many(calendarEvents),
+}));
+
+export const groupMessageMembersRelations = relations(groupMessageMembers, ({ one }) => ({
+  group: one(groupMessages, {
+    fields: [groupMessageMembers.groupId],
+    references: [groupMessages.id],
+  }),
+  user: one(users, {
+    fields: [groupMessageMembers.userId],
+    references: [users.id],
+  }),
+}));
+
+export const groupChatMessagesRelations = relations(groupChatMessages, ({ one }) => ({
+  group: one(groupMessages, {
+    fields: [groupChatMessages.groupId],
+    references: [groupMessages.id],
+  }),
+  sender: one(users, {
+    fields: [groupChatMessages.senderId],
+    references: [users.id],
+  }),
+}));
+
+// Calendar Events relations
+export const calendarEventsRelations = relations(calendarEvents, ({ one, many }) => ({
+  creator: one(users, {
+    fields: [calendarEvents.createdBy],
+    references: [users.id],
+  }),
+  group: one(groupMessages, {
+    fields: [calendarEvents.groupId],
+    references: [groupMessages.id],
+  }),
+  participants: many(calendarEventParticipants),
+}));
+
+export const calendarEventParticipantsRelations = relations(calendarEventParticipants, ({ one }) => ({
+  event: one(calendarEvents, {
+    fields: [calendarEventParticipants.eventId],
+    references: [calendarEvents.id],
+  }),
+  user: one(users, {
+    fields: [calendarEventParticipants.userId],
+    references: [users.id],
+  }),
+}));
+
 // Schemas
 export const insertUserSchema = createInsertSchema(users);
 export const insertProfileSchema = createInsertSchema(profiles).omit({
@@ -366,6 +481,30 @@ export const insertGymMemberSchema = createInsertSchema(gymMembers).omit({
   joinedAt: true,
 });
 
+export const insertGroupMessageSchema = createInsertSchema(groupMessages).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export const insertGroupMessageMemberSchema = createInsertSchema(groupMessageMembers).omit({
+  id: true,
+  joinedAt: true,
+});
+export const insertGroupChatMessageSchema = createInsertSchema(groupChatMessages).omit({
+  id: true,
+  sentAt: true,
+});
+export const insertCalendarEventSchema = createInsertSchema(calendarEvents).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export const insertCalendarEventParticipantSchema = createInsertSchema(calendarEventParticipants).omit({
+  id: true,
+  invitedAt: true,
+  respondedAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -391,6 +530,16 @@ export type GymLead = typeof gymLeads.$inferSelect;
 export type InsertGymLead = z.infer<typeof insertGymLeadSchema>;
 export type GymMember = typeof gymMembers.$inferSelect;
 export type InsertGymMember = z.infer<typeof insertGymMemberSchema>;
+export type GroupMessage = typeof groupMessages.$inferSelect;
+export type InsertGroupMessage = z.infer<typeof insertGroupMessageSchema>;
+export type GroupMessageMember = typeof groupMessageMembers.$inferSelect;
+export type InsertGroupMessageMember = z.infer<typeof insertGroupMessageMemberSchema>;
+export type GroupChatMessage = typeof groupChatMessages.$inferSelect;
+export type InsertGroupChatMessage = z.infer<typeof insertGroupChatMessageSchema>;
+export type CalendarEvent = typeof calendarEvents.$inferSelect;
+export type InsertCalendarEvent = z.infer<typeof insertCalendarEventSchema>;
+export type CalendarEventParticipant = typeof calendarEventParticipants.$inferSelect;
+export type InsertCalendarEventParticipant = z.infer<typeof insertCalendarEventParticipantSchema>;
 
 // Combined user with profile type
 export type UserWithProfile = User & {

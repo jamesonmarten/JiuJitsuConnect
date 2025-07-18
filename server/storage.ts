@@ -7,6 +7,11 @@ import {
   trainingMedia,
   messages,
   trainingSessions,
+  groupMessages,
+  groupMessageMembers,
+  groupChatMessages,
+  calendarEvents,
+  calendarEventParticipants,
   type User,
   type UpsertUser,
   type Profile,
@@ -24,6 +29,16 @@ import {
   type InsertMessage,
   type TrainingSession,
   type InsertTrainingSession,
+  type GroupMessage,
+  type InsertGroupMessage,
+  type GroupMessageMember,
+  type InsertGroupMessageMember,
+  type GroupChatMessage,
+  type InsertGroupChatMessage,
+  type CalendarEvent,
+  type InsertCalendarEvent,
+  type CalendarEventParticipant,
+  type InsertCalendarEventParticipant,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, or, ilike, avg, count, desc, gt } from "drizzle-orm";
@@ -86,6 +101,38 @@ export interface IStorage {
   getTrainingSessions(userId: string): Promise<TrainingSession[]>;
   updateTrainingSession(sessionId: number, updates: Partial<InsertTrainingSession>): Promise<TrainingSession>;
   deleteTrainingSession(sessionId: number, userId: string): Promise<void>;
+
+  // Group Message operations
+  createGroupMessage(group: InsertGroupMessage): Promise<GroupMessage>;
+  getGroupMessage(groupId: number): Promise<GroupMessage | undefined>;
+  getUserGroupMessages(userId: string): Promise<GroupMessage[]>;
+  updateGroupMessage(groupId: number, updates: Partial<InsertGroupMessage>): Promise<GroupMessage>;
+  deleteGroupMessage(groupId: number, userId: string): Promise<void>;
+
+  // Group Message Member operations
+  addGroupMember(member: InsertGroupMessageMember): Promise<GroupMessageMember>;
+  getGroupMembers(groupId: number): Promise<GroupMessageMember[]>;
+  removeGroupMember(groupId: number, userId: string): Promise<void>;
+  updateGroupMemberRole(groupId: number, userId: string, role: string): Promise<GroupMessageMember>;
+
+  // Group Chat Message operations
+  createGroupChatMessage(message: InsertGroupChatMessage): Promise<GroupChatMessage>;
+  getGroupChatMessages(groupId: number, limit?: number, offset?: number): Promise<GroupChatMessage[]>;
+  deleteGroupChatMessage(messageId: number, userId: string): Promise<void>;
+
+  // Calendar Event operations
+  createCalendarEvent(event: InsertCalendarEvent): Promise<CalendarEvent>;
+  getCalendarEvent(eventId: number): Promise<CalendarEvent | undefined>;
+  getUserCalendarEvents(userId: string): Promise<CalendarEvent[]>;
+  getUpcomingEvents(userId: string, limit?: number): Promise<CalendarEvent[]>;
+  updateCalendarEvent(eventId: number, updates: Partial<InsertCalendarEvent>): Promise<CalendarEvent>;
+  deleteCalendarEvent(eventId: number, userId: string): Promise<void>;
+
+  // Calendar Event Participant operations
+  addEventParticipant(participant: InsertCalendarEventParticipant): Promise<CalendarEventParticipant>;
+  getEventParticipants(eventId: number): Promise<CalendarEventParticipant[]>;
+  updateEventParticipantStatus(eventId: number, userId: string, status: string): Promise<CalendarEventParticipant>;
+  removeEventParticipant(eventId: number, userId: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -587,6 +634,230 @@ export class DatabaseStorage implements IStorage {
           eq(trainingSessions.partnerId, userId)
         )
       ));
+  }
+
+  // Group Message operations
+  async createGroupMessage(group: InsertGroupMessage): Promise<GroupMessage> {
+    const [newGroup] = await db
+      .insert(groupMessages)
+      .values(group)
+      .returning();
+    return newGroup;
+  }
+
+  async getGroupMessage(groupId: number): Promise<GroupMessage | undefined> {
+    const [group] = await db
+      .select()
+      .from(groupMessages)
+      .where(eq(groupMessages.id, groupId));
+    return group;
+  }
+
+  async getUserGroupMessages(userId: string): Promise<GroupMessage[]> {
+    const groups = await db
+      .select()
+      .from(groupMessages)
+      .innerJoin(groupMessageMembers, eq(groupMessages.id, groupMessageMembers.groupId))
+      .where(eq(groupMessageMembers.userId, userId))
+      .orderBy(desc(groupMessages.updatedAt));
+    return groups.map(g => g.group_messages);
+  }
+
+  async updateGroupMessage(groupId: number, updates: Partial<InsertGroupMessage>): Promise<GroupMessage> {
+    const [group] = await db
+      .update(groupMessages)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(groupMessages.id, groupId))
+      .returning();
+    return group;
+  }
+
+  async deleteGroupMessage(groupId: number, userId: string): Promise<void> {
+    await db
+      .delete(groupMessages)
+      .where(
+        and(
+          eq(groupMessages.id, groupId),
+          eq(groupMessages.createdBy, userId)
+        )
+      );
+  }
+
+  // Group Message Member operations
+  async addGroupMember(member: InsertGroupMessageMember): Promise<GroupMessageMember> {
+    const [newMember] = await db
+      .insert(groupMessageMembers)
+      .values(member)
+      .returning();
+    return newMember;
+  }
+
+  async getGroupMembers(groupId: number): Promise<GroupMessageMember[]> {
+    return await db
+      .select()
+      .from(groupMessageMembers)
+      .where(eq(groupMessageMembers.groupId, groupId))
+      .orderBy(desc(groupMessageMembers.joinedAt));
+  }
+
+  async removeGroupMember(groupId: number, userId: string): Promise<void> {
+    await db
+      .delete(groupMessageMembers)
+      .where(
+        and(
+          eq(groupMessageMembers.groupId, groupId),
+          eq(groupMessageMembers.userId, userId)
+        )
+      );
+  }
+
+  async updateGroupMemberRole(groupId: number, userId: string, role: string): Promise<GroupMessageMember> {
+    const [member] = await db
+      .update(groupMessageMembers)
+      .set({ role })
+      .where(
+        and(
+          eq(groupMessageMembers.groupId, groupId),
+          eq(groupMessageMembers.userId, userId)
+        )
+      )
+      .returning();
+    return member;
+  }
+
+  // Group Chat Message operations
+  async createGroupChatMessage(message: InsertGroupChatMessage): Promise<GroupChatMessage> {
+    const [newMessage] = await db
+      .insert(groupChatMessages)
+      .values(message)
+      .returning();
+    return newMessage;
+  }
+
+  async getGroupChatMessages(groupId: number, limit: number = 50, offset: number = 0): Promise<GroupChatMessage[]> {
+    return await db
+      .select()
+      .from(groupChatMessages)
+      .where(eq(groupChatMessages.groupId, groupId))
+      .orderBy(desc(groupChatMessages.sentAt))
+      .limit(limit)
+      .offset(offset);
+  }
+
+  async deleteGroupChatMessage(messageId: number, userId: string): Promise<void> {
+    await db
+      .delete(groupChatMessages)
+      .where(
+        and(
+          eq(groupChatMessages.id, messageId),
+          eq(groupChatMessages.senderId, userId)
+        )
+      );
+  }
+
+  // Calendar Event operations
+  async createCalendarEvent(event: InsertCalendarEvent): Promise<CalendarEvent> {
+    const [newEvent] = await db
+      .insert(calendarEvents)
+      .values(event)
+      .returning();
+    return newEvent;
+  }
+
+  async getCalendarEvent(eventId: number): Promise<CalendarEvent | undefined> {
+    const [event] = await db
+      .select()
+      .from(calendarEvents)
+      .where(eq(calendarEvents.id, eventId));
+    return event;
+  }
+
+  async getUserCalendarEvents(userId: string): Promise<CalendarEvent[]> {
+    const events = await db
+      .select()
+      .from(calendarEvents)
+      .innerJoin(calendarEventParticipants, eq(calendarEvents.id, calendarEventParticipants.eventId))
+      .where(eq(calendarEventParticipants.userId, userId))
+      .orderBy(calendarEvents.startTime);
+    return events.map(e => e.calendar_events);
+  }
+
+  async getUpcomingEvents(userId: string, limit: number = 10): Promise<CalendarEvent[]> {
+    const events = await db
+      .select()
+      .from(calendarEvents)
+      .innerJoin(calendarEventParticipants, eq(calendarEvents.id, calendarEventParticipants.eventId))
+      .where(
+        and(
+          eq(calendarEventParticipants.userId, userId),
+          gt(calendarEvents.startTime, new Date())
+        )
+      )
+      .orderBy(calendarEvents.startTime)
+      .limit(limit);
+    return events.map(e => e.calendar_events);
+  }
+
+  async updateCalendarEvent(eventId: number, updates: Partial<InsertCalendarEvent>): Promise<CalendarEvent> {
+    const [event] = await db
+      .update(calendarEvents)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(calendarEvents.id, eventId))
+      .returning();
+    return event;
+  }
+
+  async deleteCalendarEvent(eventId: number, userId: string): Promise<void> {
+    await db
+      .delete(calendarEvents)
+      .where(
+        and(
+          eq(calendarEvents.id, eventId),
+          eq(calendarEvents.createdBy, userId)
+        )
+      );
+  }
+
+  // Calendar Event Participant operations
+  async addEventParticipant(participant: InsertCalendarEventParticipant): Promise<CalendarEventParticipant> {
+    const [newParticipant] = await db
+      .insert(calendarEventParticipants)
+      .values(participant)
+      .returning();
+    return newParticipant;
+  }
+
+  async getEventParticipants(eventId: number): Promise<CalendarEventParticipant[]> {
+    return await db
+      .select()
+      .from(calendarEventParticipants)
+      .where(eq(calendarEventParticipants.eventId, eventId))
+      .orderBy(calendarEventParticipants.invitedAt);
+  }
+
+  async updateEventParticipantStatus(eventId: number, userId: string, status: string): Promise<CalendarEventParticipant> {
+    const [participant] = await db
+      .update(calendarEventParticipants)
+      .set({ status, respondedAt: new Date() })
+      .where(
+        and(
+          eq(calendarEventParticipants.eventId, eventId),
+          eq(calendarEventParticipants.userId, userId)
+        )
+      )
+      .returning();
+    return participant;
+  }
+
+  async removeEventParticipant(eventId: number, userId: string): Promise<void> {
+    await db
+      .delete(calendarEventParticipants)
+      .where(
+        and(
+          eq(calendarEventParticipants.eventId, eventId),
+          eq(calendarEventParticipants.userId, userId)
+        )
+      );
   }
 }
 

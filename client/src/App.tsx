@@ -16,6 +16,8 @@ import InstructorNotes from "@/pages/InstructorNotes";
 import GymFinder from "@/pages/GymFinder";
 import Recommendations from "@/pages/Recommendations";
 import TrainingSessions from "@/pages/TrainingSessions";
+import GroupMessages from "@/pages/GroupMessages";
+import Calendar from "@/pages/Calendar";
 import UserGuide from "@/pages/UserGuide";
 import Lessons from "@/pages/Lessons";
 import Navbar from "@/components/Navbar";
@@ -66,6 +68,8 @@ function Router() {
             <Route path="/gym-finder" component={GymFinder} />
             <Route path="/recommendations" component={Recommendations} />
             <Route path="/training-sessions" component={TrainingSessions} />
+            <Route path="/messages" component={GroupMessages} />
+            <Route path="/calendar" component={Calendar} />
             <Route path="/guide" component={UserGuide} />
             <Route path="/lessons" component={Lessons} />
             <Route component={NotFound} />
