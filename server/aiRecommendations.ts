@@ -44,6 +44,10 @@ export async function generateTrainingPartnerRecommendations(
     }
   } catch (error) {
     console.error("Error in generateTrainingPartnerRecommendations:", error);
+    // Filter out current user from available partners for fallback
+    const eligiblePartners = availablePartners.filter(
+      partner => partner.id !== currentUser.id
+    );
     return generateFallbackRecommendations(criteria, eligiblePartners);
   }
 }
