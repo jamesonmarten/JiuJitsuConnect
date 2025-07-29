@@ -419,11 +419,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Personalized Training Plan Generator
   app.post('/api/training-plan', isAuthenticated, async (req: any, res) => {
     try {
+      console.log("Training plan request received:", req.body);
       const userId = req.user.claims.sub;
       const { partnerId } = req.body;
       
       const currentUser = await storage.getUserWithProfile(userId);
       if (!currentUser) {
+        console.log("User not found:", userId);
         return res.status(404).json({ message: "User profile not found" });
       }
 
@@ -432,12 +434,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         partner = await storage.getUserWithProfile(partnerId);
       }
 
+      console.log("Generating training plan for user:", currentUser.firstName, partnerId ? `with partner: ${partner?.firstName}` : "solo");
       const trainingPlan = await generatePersonalizedTrainingPlan(currentUser, partner);
       
+      console.log("Training plan generated successfully");
       res.json(trainingPlan);
     } catch (error) {
       console.error("Error generating training plan:", error);
-      res.status(500).json({ message: "Failed to generate training plan" });
+      res.status(500).json({ message: "Failed to generate training plan", error: error.message });
     }
   });
 

@@ -69,11 +69,8 @@ export default function Recommendations() {
   // Generate training plan mutation
   const trainingPlanMutation = useMutation({
     mutationFn: async (partnerId?: string): Promise<TrainingPlan> => {
-      const response = await apiRequest("/api/training-plan", {
-        method: "POST",
-        body: JSON.stringify({ partnerId }),
-      });
-      return response;
+      const response = await apiRequest("/api/training-plan", "POST", { partnerId });
+      return response.json();
     },
     onSuccess: (data: TrainingPlan) => {
       toast({
@@ -82,6 +79,7 @@ export default function Recommendations() {
       });
     },
     onError: (error: any) => {
+      console.error("Training plan error:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to generate training plan",
