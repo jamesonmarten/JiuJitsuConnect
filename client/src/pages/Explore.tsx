@@ -12,6 +12,7 @@ import type { UserWithProfile } from "@shared/schema";
 export default function Explore() {
   const [searchInput, setSearchInput] = useState("");
   const [locationInput, setLocationInput] = useState("");
+  const [searchTrigger, setSearchTrigger] = useState(0);
   const [filters, setFilters] = useState({
     search: "",
     location: "",
@@ -20,7 +21,7 @@ export default function Explore() {
   });
 
   const { data: users = [], isLoading } = useQuery<UserWithProfile[]>({
-    queryKey: ["/api/users", filters],
+    queryKey: ["/api/users", filters, searchTrigger],
     queryFn: async () => {
       const searchParams = new URLSearchParams();
       
@@ -50,6 +51,7 @@ export default function Explore() {
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
+    setSearchTrigger(prev => prev + 1);
   };
 
   const handleSearch = () => {
@@ -58,6 +60,7 @@ export default function Explore() {
       search: searchInput,
       location: locationInput 
     }));
+    setSearchTrigger(prev => prev + 1);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
