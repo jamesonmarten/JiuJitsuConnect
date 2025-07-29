@@ -10,9 +10,11 @@ import { MapPin, Star, Users, Search } from "lucide-react";
 import type { UserWithProfile } from "@shared/schema";
 
 export default function Explore() {
+  const [searchInput, setSearchInput] = useState("");
+  const [locationInput, setLocationInput] = useState("");
   const [filters, setFilters] = useState({
     search: "",
-    location: "all",
+    location: "",
     role: "all",
     skillLevel: "all",
   });
@@ -26,7 +28,7 @@ export default function Explore() {
       if (filters.search && filters.search.trim()) {
         searchParams.append('search', filters.search);
       }
-      if (filters.location && filters.location !== 'all') {
+      if (filters.location && filters.location.trim()) {
         searchParams.append('location', filters.location);
       }
       if (filters.role && filters.role !== 'all') {
@@ -48,6 +50,20 @@ export default function Explore() {
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleSearch = () => {
+    setFilters(prev => ({ 
+      ...prev, 
+      search: searchInput,
+      location: locationInput 
+    }));
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   if (isLoading) {
@@ -94,16 +110,30 @@ export default function Explore() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Input
-              placeholder="Search by name..."
-              value={filters.search}
-              onChange={(e) => handleFilterChange("search", e.target.value)}
-            />
-            <Input
-              placeholder="Location..."
-              value={filters.location}
-              onChange={(e) => handleFilterChange("location", e.target.value)}
-            />
+            <div className="flex gap-2">
+              <Input
+                placeholder="Search by name..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={handleKeyPress}
+                className="flex-1"
+              />
+              <Button onClick={handleSearch} size="sm">
+                Go
+              </Button>
+            </div>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Location..."
+                value={locationInput}
+                onChange={(e) => setLocationInput(e.target.value)}
+                onKeyDown={handleKeyPress}
+                className="flex-1"
+              />
+              <Button onClick={handleSearch} size="sm">
+                Go
+              </Button>
+            </div>
             <Select value={filters.role} onValueChange={(value) => handleFilterChange("role", value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Role" />
